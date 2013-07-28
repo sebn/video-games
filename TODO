@@ -1,0 +1,40 @@
+Badnik 0.2
+	GUI:
+		Clean up the main games view:
+			Update it regularly:
+				search for new games
+				if a game isn't available anymore, remove it from the GUI
+			Don't duplicate games (done except for concurrent access)
+		Clean up the single game view
+	
+	Workflow and code:
+		Polish the "desktop" system
+		Add more comments
+
+Badnik 0.3
+	GUI:
+		Move the window with "alt+drag"
+		Move window by dragging the toolbar
+		Move to GNOME 3.10:
+			Move to the undecorated design (toolbar with window control)
+		Add the fulscreen action (or remove it)
+	
+	Workflow and code:
+		Add a man page
+		Log the game output
+		Prevent multiple instances of a game to be run
+		Add some basic command line options (help, verbose...)
+		Add internationalization
+	
+	Get a proper identity:
+		Get a meaningful name
+		Get a legal icon
+
+Badnik 0.4
+	GUI:
+		Debug the menu (view as) (it works but the dots aren't displayed as they are supposed to be)
+		Add the help action
+	
+	Systems:
+		Enable to add game sources (useful for other systems than "desktop")
+		Add more systems (snes ? megadrive ? scummvm ? dosbox ?)

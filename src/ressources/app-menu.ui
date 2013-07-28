@@ -1,0 +1,43 @@
+<interface>
+  <menu id="app-menu">
+    <section>
+      <item>
+        <attribute name="action">app.add-games</attribute>
+        <attribute name="label" translatable="yes">Add games</attribute>
+      </item>
+    </section>
+    <section>
+      <attribute name="label" translatable="yes">View as</attribute>
+      <item>
+        <attribute name="action">app.view-as</attribute>
+        <attribute name="target">icon</attribute>
+        <attribute name="label" translatable="yes">Grid</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.view-as</attribute>
+        <attribute name="target">list</attribute>
+        <attribute name="label" translatable="yes">List</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">app.fullscreen</attribute>
+        <attribute name="label" translatable="yes">Fullscreen</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">app.about</attribute>
+        <attribute name="label" translatable="yes">About Badnick</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.help</attribute>
+        <attribute name="label" translatable="yes">Help</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.quit</attribute>
+        <attribute name="label" translatable="yes">Quit</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

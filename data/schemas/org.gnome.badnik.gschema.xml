@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="badnik">
+	<schema path="/org/gnome/badnik/" id="org.gnome.badnik" gettext-domain="badnik">
+		<key name="view-as" type="s">
+			<default>'icon'</default>
+			<summary>View as</summary>
+			<description>View as type</description>
+		</key>
+	</schema>
+</schemalist>
