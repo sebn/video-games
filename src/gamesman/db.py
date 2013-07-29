@@ -57,7 +57,7 @@ class GamesDB(GObject.Object):
 		system_list = []
 		system_list.append(desktop.Desktop(self))
 		#system_list.append(snes.SNES(self))
-		#system_list.append(megadrive.MegaDrive(self))
+		system_list.append(megadrive.MegaDrive(self))
 		
 		self.systems = {}
 		for system in system_list:

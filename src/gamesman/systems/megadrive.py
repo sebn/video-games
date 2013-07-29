@@ -19,36 +19,64 @@
 
 from os import walk, path
 from gamesman.systems.utils import has_suffix
+from gamesman import GameInfo
 
 from gamesman.systems.tosecsystem import TOSECSystem
+import sqlite3
 
 class MegaDrive(TOSECSystem):
 	def __init__(self, gamesdb):
 		TOSECSystem.__init__(self, gamesdb, "megadrive")
-		gamesdb.db.execute('''CREATE TABLE IF NOT EXISTS ''' + self.system + '''
+		db = sqlite3.connect(self.gamesdb.path)
+		db.execute('''CREATE TABLE IF NOT EXISTS ''' + self.system + '''
 				          (
 				            id INTEGER PRIMARY KEY,
 				            path TEXT
 				          )''')
+		db.commit()
+		db.close()
+	
+	def get_game_info(self, id):
+		'''Return a GameInfo object representing the game or None if an error occured.'''
+		db = sqlite3.connect(self.gamesdb.path)
+		c = db.cursor()
+		c.execute('SELECT megadrive.id, megadrive.path, games.time_played, games.last_played FROM games, megadrive WHERE games.gameid = megadrive.id AND megadrive.id = ?', [id])
+		result = c.fetchone()
+		db.close()
+		info = None
+		
+		if result:
+			path = result[1]
+			info = GameInfo()
+			info.id = id
+			info.title = self.gamesdb.tosec.get_game_title(path)
+			info.cover = self.gamesdb.app.iconsdir + "/" + self.system + ".png"
+			info.system = self.system
+			info.played = result[2]
+			info.playedlast = result[3]
+		
+		return info
 	
 	def update_db(self):
+		db = sqlite3.connect(self.gamesdb.path)
 		for rom in self.get_roms():
 			id = None
-			for row in self.gamesdb.db.execute('SELECT id FROM ' + self.system + ' WHERE path = ?', [rom]):
+			for row in db.execute('SELECT id FROM ' + self.system + ' WHERE path = ?', [rom]):
 				id = row[0]
 			
 			# Search in the games table
 			if not id:
-				self.gamesdb.db.execute('INSERT INTO ' + self.system + ' VALUES (NULL, ?)', [rom])
-				for row in self.gamesdb.db.execute('SELECT id FROM ' + self.system + ' WHERE path = ?', [rom]):
+				db.execute('INSERT INTO ' + self.system + ' VALUES (NULL, ?)', [rom])
+				for row in db.execute('SELECT id FROM ' + self.system + ' WHERE path = ?', [rom]):
 					id = row[0]
 				
-				self.gamesdb.db.execute('INSERT INTO games VALUES (NULL, ?, ?, 0, 0)', [id, self.system])
-		self.gamesdb.db.commit()
+				db.execute('INSERT INTO games VALUES (NULL, ?, ?, 0, 0)', [id, self.system])
+		db.commit()
+		db.close
 	
 	def get_roms(self):
 		roms = []
-		for root, dirs, files in walk("/home/kekun/Jeux"):
+		for root, dirs, files in walk(path.expanduser("~")):
 			for file in files:
 				file = path.join(root, file)
 				if self.is_rom(file):
@@ -57,3 +85,16 @@ class MegaDrive(TOSECSystem):
 	
 	def is_rom(self, file):
 		return has_suffix(file, "md")
+	
+	def is_game_available(self, id):
+		return True
+		db = sqlite3.connect(self.gamesdb.path)
+		exists = False
+		for row in db.execute('SELECT path FROM megadrive WHERE id = ?', [id]):
+			exists = path.exists(row[0])
+			break
+		db.close()
+		return exists
+	
+	def get_game_exec(self, id):
+		return ""

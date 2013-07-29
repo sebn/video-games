@@ -29,13 +29,13 @@ class TOSEC:
 		self.path = os.path.join(directory, "tosec.db")
 		
 		# Init the database
-		self.db = sqlite3.connect(self.path)
-		self.db.execute('''CREATE TABLE IF NOT EXISTS systems
+		db = sqlite3.connect(self.path)
+		db.execute('''CREATE TABLE IF NOT EXISTS systems
 				          (
 				            id TEXT PRIMARY KEY,
 				            version TEXT
 				          )''')
-		self.db.execute('''CREATE TABLE IF NOT EXISTS games
+		db.execute('''CREATE TABLE IF NOT EXISTS games
 				          (
 				            id INTEGER PRIMARY KEY,
 				            title TEXT,
@@ -43,7 +43,7 @@ class TOSEC:
 				            system TEXT,
 				            UNIQUE (title, flags, system)
 				          )''')
-		self.db.execute('''CREATE TABLE IF NOT EXISTS roms
+		db.execute('''CREATE TABLE IF NOT EXISTS roms
 				          (
 				            id INTEGER PRIMARY KEY,
 				            flags TEXT,
@@ -54,22 +54,15 @@ class TOSEC:
 				            game INTEGER,
 				            FOREIGN KEY(game) REFERENCES game(id)
 				          )''')
-	
-	def __enter__(self):
-		print('enter')
-		return self
-	
-	def __exit__(self, type, value, traceback):
-		print('exit')
-		self.db.close()
-	
-	def __del__(self):
-		self.db.close()
+		db.commit()
+		db.close()
 	
 	def parse_file(self, file, system):
 		'''Add a data file for the given system and update the database if this data file's version is newer than the previous one for the given system or simply add it if there was no database for this system.'''
 		words = tosec_to_words(file)
 		info, games = get_games_from_words(words)
+		
+		db = sqlite3.connect(self.path)
 		
 		# If the info don't have a version, it is not valid and the file shouldn't be added
 		if not "version" in info:
@@ -79,7 +72,7 @@ class TOSEC:
 		
 		# Check the version actually in the database
 		actual_version = None
-		for row in self.db.execute('SELECT version FROM systems WHERE id = ?', [system]):
+		for row in db.execute('SELECT version FROM systems WHERE id = ?', [system]):
 			actual_version = row[0]
 		
 		# If the old version is more recent thab the new one, the new one shouldn't be added
@@ -88,9 +81,9 @@ class TOSEC:
 		
 		# What if we have to update the version instead of adding it ?
 		if actual_version:
-			self.db.execute('UPDATE systems SET version = ? WHERE id = ?', [new_version, system])
+			db.execute('UPDATE systems SET version = ? WHERE id = ?', [new_version, system])
 		else:
-			self.db.execute('INSERT INTO systems (id, version) VALUES (?, ?)', [system, new_version])
+			db.execute('INSERT INTO systems (id, version) VALUES (?, ?)', [system, new_version])
 		
 		for game in games:
 			rom = game["rom"]
@@ -100,24 +93,25 @@ class TOSEC:
 			
 			# Adding game
 			game_info = [title, game_flags, system]
-			for row in self.db.execute('SELECT id FROM games WHERE title = ? AND flags = ? AND system = ?', game_info):
+			for row in db.execute('SELECT id FROM games WHERE title = ? AND flags = ? AND system = ?', game_info):
 				game_id = row[0]
 			if not game_id:
-				self.db.execute('INSERT INTO games(id, title, flags, system) VALUES (NULL, ?, ?, ?)', game_info)
-				for row in self.db.execute('SELECT id FROM games WHERE title = ? AND flags = ? AND system = ?', game_info):
+				db.execute('INSERT INTO games(id, title, flags, system) VALUES (NULL, ?, ?, ?)', game_info)
+				for row in db.execute('SELECT id FROM games WHERE title = ? AND flags = ? AND system = ?', game_info):
 					game_id = row[0]
 			
 			# Adding rom
 			rom_info = [rom_flags, rom["size"], rom["crc"], rom["md5"], rom["sha1"]]
 			rom_exists = False
-			for row in self.db.execute('SELECT id FROM roms WHERE flags = ? AND size = ? AND crc = ? AND md5 = ? AND sha1 = ?', rom_info):
+			for row in db.execute('SELECT id FROM roms WHERE flags = ? AND size = ? AND crc = ? AND md5 = ? AND sha1 = ?', rom_info):
 				rom_exists = True
 			if not rom_exists:
 				rom_info.append(game_id)
 				rom_info = [rom_flags, rom["size"], rom["crc"], rom["md5"], rom["sha1"], game_id]
-				self.db.execute('INSERT INTO roms(id, flags, size, crc, md5, sha1, game) VALUES (NULL, ?, ?, ?, ?, ?, ?)', rom_info)
+				db.execute('INSERT INTO roms(id, flags, size, crc, md5, sha1, game) VALUES (NULL, ?, ?, ?, ?, ?, ?)', rom_info)
 		
-		self.db.commit()
+		db.commit()
+		db.close()
 		return True
 	
 	def get_rom_id(self, rom):
@@ -127,16 +121,24 @@ class TOSEC:
 		md5 = hashlib.md5(data).hexdigest()
 		sha1 = hashlib.sha1(data).hexdigest()
 		
-		for row in self.db.execute('SELECT id FROM roms WHERE md5 = ? AND sha1 = ?', [md5, sha1]):
-			return row[0]
-		return None
+		db = sqlite3.connect(self.path)
+		
+		id = None
+		for row in db.execute('SELECT id FROM roms WHERE md5 = ? AND sha1 = ?', [md5, sha1]):
+			id = row[0]
+		
+		db.close()
+		return id
 	
 	def get_game_title(self, rom):
 		id = self.get_rom_id(rom)
 		
 		if id:
-			for row in self.db.execute('SELECT title FROM games, roms WHERE roms.game = games.id AND roms.id = ?', [id]):
-				return row[0]
+			db = sqlite3.connect(self.path)
+			title = None
+			for row in db.execute('SELECT title FROM games, roms WHERE roms.game = games.id AND roms.id = ?', [id]):
+				title = row[0]
+			db.close()
 		return os.path.basename(rom)
 
 def tosec_to_words(file):
