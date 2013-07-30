@@ -73,8 +73,9 @@ sources = $(SOURCES:%=$(DATADIR)/%)
 icons = $(ICONS:%=$(datadir)/%)
 icontheme = $(datadir)/icons/hicolor/index.theme
 systemicons = $(SYSTEMICONS:%=$(DATADIR)/%)
+tosec = $(TOSEC:%=$(DATADIR)/%)
 
-PHONY: install
+all:
 
 install: $(desktop)
 
@@ -82,7 +83,7 @@ $(desktop): $(DESKTOP) $(bin) $(icontheme)
 	cp -f $< $(@D)
 	chmod +x $@
 
-$(bin): $(installedschemas) $(sources)
+$(bin): $(installedschemas) $(sources) $(tosec)
 	ln -fs $(SRCDIR)/main.py $@
 	chmod +x $(SRCDIR)/main.py
 	chmod +x $@
@@ -106,3 +107,9 @@ $(icontheme): $(icons)
 $(icons): $(datadir)/%: %
 	mkdir -p $(@D)
 	cp -f $< $(@D)
+
+$(tosec): $(DATADIR)/%: %
+	mkdir -p $(@D)
+	cp -f $< $(@D)
+
+PHONY: all install

@@ -25,10 +25,10 @@ from os import walk
 import sqlite3
 
 from gi.repository import Gtk
+from gi.repository import GamesManager
 
 from gamesman.systems.basesystem import BaseSystem
 from gamesman.metadata import mobygames
-from gamesman import GameInfo
 
 class Desktop(BaseSystem):
 	BLACK_LIST = [ "steam.desktop",
@@ -62,18 +62,18 @@ class Desktop(BaseSystem):
 		
 		if result:
 			entry = DesktopEntry.DesktopEntry(result[1])
-			info = GameInfo()
-			info.id = id
-			info.title = entry.getName()
-			info.developer = result[2]
-			info.icon = entry.getIcon()
-			info.released = result[3]
-			info.system = self.system
-			info.genre = result[4]
-			info.played = result[7]
-			info.playedlast = result[8]
-			info.description = result[5]
-			info.rank = result[6]
+			info = GamesManager.GameInfo()
+			info.set_property("id", id)
+			info.set_property("title", entry.getName())
+			info.set_property("developer", result[2])
+			info.set_property("icon", entry.getIcon())
+			info.set_property("released", result[3])
+			info.set_property("system", self.system)
+			info.set_property("genre", result[4])
+			info.set_property("played", result[7])
+			info.set_property("playedlast", result[8])
+			info.set_property("description", result[5])
+			info.set_property("rank", result[6])
 		
 		return info
 	

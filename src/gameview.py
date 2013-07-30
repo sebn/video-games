@@ -95,9 +95,9 @@ class MainGameView(Gtk.Box):
 	def add_game(self, id):
 		if (not self.has_game(id)) and self.app.gamesdb.is_game_available(id):
 			info = self.app.gamesdb.get_game_info(id)
-			gameid = info.id
-			developer = info.developer
-			name = info.title
+			gameid = info.get_property("id")
+			developer = info.get_property("developer")
+			name = info.get_property("title")
 			icon = info.get_pixbuf(128, 0)
 			
 			self.view.get_model().append([str(id), "", name, developer, icon, int(time.time()), False])
@@ -142,8 +142,8 @@ class MainGameView(Gtk.Box):
 		
 		if iter:
 			info = self.app.gamesdb.get_game_info(id)
-			self.model.set_value(iter, 2, info.title)
-			self.model.set_value(iter, 3, info.developer)
+			self.model.set_value(iter, 2, info.get_property("title"))
+			self.model.set_value(iter, 3, info.get_property("developer"))
 			#self.model.set_value(iter, 4, info.get_pixbuf(128, 0))
 			self.model.set_value(iter, 5, int(time.time()))
 	
@@ -168,7 +168,7 @@ class MainGameView(Gtk.Box):
 		
 		# Show
 		info = self.app.gamesdb.get_game_info(id)
-		self.toolbar.set_labels(info.title, None)
+		self.toolbar.set_labels(info.get_property("title"), None)
 		if self.gameview:
 			self.gameview.set_game(id)
 		else:
@@ -393,11 +393,11 @@ class GameView(Gtk.ScrolledWindow):
 		info = self.app.gamesdb.get_game_info(self.app.focused_game)
 		
 		# Set the title
-		title = info.title if info.title else "Unknown title"
+		title = info.get_property("title") if info.get_property("title") else "Unknown title"
 		self.title.set_markup("<span size='large'>" + title + "</span>")
 		
 		# Set the developer
-		developer = info.developer if info.developer else "Unknown developer"
+		developer = info.get_property("developer") if info.get_property("developer") else "Unknown developer"
 		self.developer.set_markup("<span size='large'>" + developer + "</span>")
 		
 		# Set the cover
@@ -405,36 +405,36 @@ class GameView(Gtk.ScrolledWindow):
 		self.cover.set_from_pixbuf(icon)
 		
 		# Set the release year
-		if info.released:
+		if info.get_property("released"):
 			self._release_year.show()
 			self.release_year.show()
-			self.release_year.set_text(info.released)
+			self.release_year.set_text(info.get_property("released"))
 		else:
 			self._release_year.hide()
 			self.release_year.hide()
 		
 		# Set the system
-		if info.system:
+		if info.get_property("system"):
 			self._system.show()
 			self.system.show()
-			self.system.set_text(info.system)
+			self.system.set_text(info.get_property("system"))
 		else:
 			self._system.hide()
 			self.system.hide()
 		
 		# Set the genre
-		if info.genre:
+		if info.get_property("genre"):
 			self._genre.show()
 			self.genre.show()
-			self.genre.set_text(info.genre)
+			self.genre.set_text(info.get_property("genre"))
 		else:
 			self._genre.hide()
 			self.genre.hide()
 		
 		# Set the play informations
-		if info.played > 0:
+		if info.get_property("played") > 0:
 			# Get the time played
-			s = int(info.played)
+			s = int(info.get_property("played"))
 			
 			d = s // 86400
 			h = (s // 3600) % 24
@@ -452,7 +452,7 @@ class GameView(Gtk.ScrolledWindow):
 			
 			# If the last play day is the current day, display the play time, else display the date
 			current_time = time.localtime()
-			last_time = time.localtime(int(info.playedlast))
+			last_time = time.localtime(int(info.get_property("playedlast")))
 			played_today = current_time[:3] == last_time[:3]
 			if played_today:
 				last_played = time.strftime("%H:%M:%S", last_time)
@@ -473,28 +473,28 @@ class GameView(Gtk.ScrolledWindow):
 			self.time_played.set_text("Never")
 		
 		# Set the players number
-		if info.players:
+		if info.get_property("players"):
 			self._players.show()
 			self.players.show()
-			self.players.set_text(info.players)
+			self.players.set_text(info.get_property("players"))
 		else:
 			self._players.hide()
 			self.players.hide()
 		
 		# Set the online mode
-		if info.online:
+		if info.get_property("online"):
 			self._online.show()
 			self.online.show()
-			self.online.set_text(info.online)
+			self.online.set_text(info.get_property("online"))
 		else:
 			self._online.hide()
 			self.online.hide()
 		
 		# Set description
-		if info.description:
+		if info.get_property("description"):
 			self._description.show()
 			self.description.show()
-			self.description.set_text(info.description)
+			self.description.set_text(info.get_property("description"))
 		else:
 			self._description.hide()
 			self.description.hide()

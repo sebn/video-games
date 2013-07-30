@@ -30,11 +30,23 @@ except:
 	sys.exit(1)
 
 execdir = os.path.dirname(os.path.realpath(sys.argv[0]))
+prefix = os.path.dirname(os.path.dirname(os.path.dirname(execdir)))
+libdir = prefix + "/lib"
 path = execdir + "/badnik.py"
 args = sys.argv[1:]
+
+libgd_ld_library = "/usr/lib64/gnome-documents/"
+libgd_gi_typelib = "/usr/lib64/gnome-documents/girepository-1.0/"
+
+libgamesman_ld_library = libdir + "/games-manager/"
+libgamesman_gi_typelib = libdir + "/games-manager/girepository-1.0/"
+
+ld_libraries = (libgd_ld_library, libgamesman_ld_library)
+gi_typelibs  = (libgd_gi_typelib, libgamesman_gi_typelib)
+
 env = os.environ
-env["LD_LIBRARY_PATH"] = "/usr/lib64/gnome-documents/"
-env["GI_TYPELIB_PATH"] = "/usr/lib64/gnome-documents/girepository-1.0/"
+env["LD_LIBRARY_PATH"] = ":".join(ld_libraries)
+env["GI_TYPELIB_PATH"] = ":".join(gi_typelibs)
 
 os.execve(path, args, env)
 

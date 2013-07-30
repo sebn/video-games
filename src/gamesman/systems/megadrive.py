@@ -19,7 +19,8 @@
 
 from os import walk, path
 from gamesman.systems.utils import has_suffix
-from gamesman import GameInfo
+
+from gi.repository import GamesManager
 
 from gamesman.systems.tosecsystem import TOSECSystem
 import sqlite3
@@ -47,13 +48,13 @@ class MegaDrive(TOSECSystem):
 		
 		if result:
 			path = result[1]
-			info = GameInfo()
-			info.id = id
-			info.title = self.gamesdb.tosec.get_game_title(path)
-			info.cover = self.gamesdb.app.iconsdir + "/" + self.system + ".png"
-			info.system = self.system
-			info.played = result[2]
-			info.playedlast = result[3]
+			info = GamesManager.GameInfo()
+			info.set_property("id", id)
+			info.set_property("title", self.gamesdb.tosec.get_game_title(path))
+			info.set_property("cover", self.gamesdb.app.iconsdir + "/" + self.system + ".png")
+			info.set_property("system", self.system)
+			info.set_property("played", result[2])
+			info.set_property("playedlast", result[3])
 		
 		return info
 	
