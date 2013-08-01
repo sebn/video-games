@@ -18,11 +18,11 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 from os import walk, path
-from gamesman.systems.utils import has_suffix
+from systems.utils import has_suffix
 
 from gi.repository import GamesManager
 
-from gamesman.systems.tosecsystem import TOSECSystem
+from systems.tosecsystem import TOSECSystem
 import sqlite3
 
 class MegaDrive(TOSECSystem):
@@ -37,7 +37,7 @@ class MegaDrive(TOSECSystem):
 		db.commit()
 		db.close()
 	
-	def get_game_info(self, id):
+	def do_get_game_info(self, id):
 		'''Return a GameInfo object representing the game or None if an error occured.'''
 		db = sqlite3.connect(self.gamesdb.path)
 		c = db.cursor()

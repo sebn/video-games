@@ -22,7 +22,6 @@ import sys, os
 from threading import Thread
 from xdg import BaseDirectory
 
-from gamesman import db, GameProcess
 from badnikwindow import BadnikWindow
 from badniklibrary import BadnikLibrary
 
@@ -41,7 +40,7 @@ class BadnikApplication(Gtk.Application):
 		self.tosecdir = self.datadir + "/data/tosec"
 		self.srcdir = self.datadir + "/src"
 		
-		self.gamesdb = db.BadnikLibrary(self)
+		self.gamesdb = BadnikLibrary(self)
 		
 		self.focused_game = None
 		
@@ -167,6 +166,39 @@ class BadnikApplication(Gtk.Application):
 		
 		if return_code == 0 or time_played > 10:
 			self.gamesdb.update_game_play_time(id, start_time, end_time)
+
+from gi.repository import GObject
+
+import shlex, subprocess, time
+from threading import Thread
+
+class GameProcess(GObject.Object, Thread):
+	'''A class representing an asynchronous game process.'''
+	
+	__gsignals__ = {
+		'game_started': (GObject.SIGNAL_RUN_FIRST, None, (int,)),
+		'game_stopped': (GObject.SIGNAL_RUN_FIRST, None, (int, int, int, int)) # Parameters are the game ID, the process's result, the start time and the end time
+	}
+	
+	def __init__(self, gamesdb, id, out=subprocess.DEVNULL, err=subprocess.DEVNULL):
+		GObject.Object.__init__(self)
+		Thread.__init__(self)
+		self.gamesdb = gamesdb
+		self.id = id
+		self.out = out
+		self.err = err
+	
+	def run(self):
+		if self.gamesdb.is_game_available(self.id):
+			args = shlex.split(self.gamesdb.get_game_exec(self.id))
+		
+			self.emit('game_started', int(self.id))
+		
+			start_time = time.time()
+			return_code = subprocess.call(args, stdout=self.out, stderr=self.err)
+			end_time = time.time()
+		
+			self.emit('game_stopped', int(self.id), int(return_code), int(start_time), int(end_time))
 
 if __name__ == '__main__':
 	app = BadnikApplication()

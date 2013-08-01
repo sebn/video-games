@@ -31,9 +31,6 @@ class BaseSystem(GamesManager.System):
 	def update_db(self):
 		pass
 		
-	def do_get_game_info(self, id):
-		return self.get_game_info(id)
-		
 	def do_get_game_exec(self, id):
 		return self.get_game_exec(id)
 		

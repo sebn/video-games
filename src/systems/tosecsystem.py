@@ -17,7 +17,7 @@
 #    
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
-from gamesman.systems.basesystem import BaseSystem
+from systems.basesystem import BaseSystem
 
 class TOSECSystem(BaseSystem):
 	def __init__(self, gamesdb, system):

@@ -27,17 +27,16 @@ SOURCES = \
 	src/badnikwindow.py \
 	src/gameview.py \
 	src/main.py \
-	src/gamesman/__init__.py \
-	src/gamesman/metadata/__init__.py \
-	src/gamesman/metadata/mobygames.py \
-	src/gamesman/metadata/tosec.py \
-	src/gamesman/systems/__init__.py \
-	src/gamesman/systems/basesystem.py \
-	src/gamesman/systems/tosecsystem.py \
-	src/gamesman/systems/desktop.py \
-	src/gamesman/systems/megadrive.py \
-	src/gamesman/systems/snes.py \
-	src/gamesman/systems/utils.py \
+	src/metadata/__init__.py \
+	src/metadata/mobygames.py \
+	src/metadata/tosec.py \
+	src/systems/__init__.py \
+	src/systems/basesystem.py \
+	src/systems/tosecsystem.py \
+	src/systems/desktop.py \
+	src/systems/megadrive.py \
+	src/systems/snes.py \
+	src/systems/utils.py \
 	src/ressources/app-menu.ui
 
 ICONS = \

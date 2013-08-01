@@ -23,10 +23,10 @@ import os.path
 
 from gi.repository import GamesManager
 
-from gamesman.metadata import tosec
-from gamesman.systems import desktop
-from gamesman.systems import megadrive
-from gamesman.systems import snes
+from metadata import tosec
+from systems import desktop
+from systems import megadrive
+from systems import snes
 
 class BadnikLibrary(GamesManager.Library):
 	'''A games dedicated database'''

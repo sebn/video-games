@@ -27,8 +27,8 @@ import sqlite3
 from gi.repository import Gtk
 from gi.repository import GamesManager
 
-from gamesman.systems.basesystem import BaseSystem
-from gamesman.metadata import mobygames
+from systems.basesystem import BaseSystem
+from metadata import mobygames
 
 class Desktop(BaseSystem):
 	BLACK_LIST = [ "steam.desktop",
@@ -51,7 +51,7 @@ class Desktop(BaseSystem):
 		              )''')
 		db.close()
 	
-	def get_game_info(self, id):
+	def do_get_game_info(self, id):
 		'''Return a GameInfo object representing the game or None if an error occured.'''
 		db = sqlite3.connect(self.path)
 		c = db.cursor()
@@ -98,10 +98,10 @@ class Desktop(BaseSystem):
 	
 	def download_metadata(self, id):
 		print("try to download metadata for", id)
-		info = self.get_game_info(id)
+		info = self.do_get_game_info(id)
 		if not info:
 			return
-		name, system = info.title, info.system
+		name, system = info.get_property("title"), info.get_property("system")
 		if not (name and system):
 			return
 		print("downloading metadata for", id)

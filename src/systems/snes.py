@@ -18,9 +18,9 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 from os import walk, path
-from gamesman.systems.utils import has_suffix
+from systems.utils import has_suffix
 
-from gamesman.systems.tosecsystem import TOSECSystem
+from systems.tosecsystem import TOSECSystem
 
 class SNES(TOSECSystem):
 	def __init__(self, gamesdb):
