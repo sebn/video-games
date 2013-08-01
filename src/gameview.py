@@ -111,8 +111,8 @@ class MainGameView(Gtk.Box):
 		
 	
 	def update(self):
-		for game in self.app.gamesdb.get_games():
-			self.add_game(game[0])
+		for id in self.app.gamesdb.get_games_id():
+			self.add_game(id)
 	
 	def update_async(self):
 		try:
@@ -164,6 +164,7 @@ class MainGameView(Gtk.Box):
 		self.add_games_button.show()
 	
 	def show_game(self, id):
+		id = int(id)
 		self.app.focus_game(id)
 		
 		# Show

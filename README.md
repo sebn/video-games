@@ -1,4 +1,4 @@
 badnik
 ======
 
-A video game managerand launcher for GNOMR.
+A video game manager and launcher for GNOME.

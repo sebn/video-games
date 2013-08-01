@@ -21,19 +21,18 @@ from gi.repository import GObject
 import sqlite3
 import os.path
 
+from gi.repository import GamesManager
+
 from gamesman.metadata import tosec
 from gamesman.systems import desktop
 from gamesman.systems import megadrive
 from gamesman.systems import snes
 
-class GamesDB(GObject.Object):
+class GamesDB(GamesManager.Library):
 	'''A games dedicated database'''
-	__gsignals__ = {
-		'game_updated': (GObject.SIGNAL_RUN_FIRST, None, (int,))
-	}
-	
 	def __init__(self, app):
-		GObject.Object.__init__(self)
+		GamesManager.Library.__init__(self, db_name = "games", db_dir = app.savedatadir)
+		
 		self.app = app
 		self.path = os.path.join(self.app.savedatadir, "games.db")
 		
@@ -59,6 +58,9 @@ class GamesDB(GObject.Object):
 		#system_list.append(snes.SNES(self))
 		system_list.append(megadrive.MegaDrive(self))
 		
+		for system in system_list:
+			self.add_system(system)
+		
 		self.systems = {}
 		for system in system_list:
 			self.systems[system.system] = system
@@ -83,11 +85,6 @@ class GamesDB(GObject.Object):
 		gameid, system = self.get_specialized_game_id(id)
 		return self.systems[system].get_game_exec(gameid)
 	
-	def get_game_info(self, id):
-		id = str(id)
-		gameid, system = self.get_specialized_game_id(id)
-		return self.systems[system].get_game_info(gameid)
-	
 	def update_play_time(self, id, start, end):
 		played = end - start
 		
@@ -110,19 +107,3 @@ class GamesDB(GObject.Object):
 		print("update db")
 		for key in self.systems.keys():
 			self.systems[key].update_db()
-	
-	def search_game(self, id, system):
-		db = sqlite3.connect(self.path)
-		value = None
-		id = str(id)
-		result = db.execute('SELECT * FROM games WHERE id = ? AND system = ? ORDER BY id, system', [id, system])
-		for row in result:
-			value = row
-		db.close()
-		return value
-	
-	def get_games(self):
-		db = sqlite3.connect(self.path)
-		result = list(db.execute('SELECT id, gameid, system FROM games'))
-		db.close()
-		return result

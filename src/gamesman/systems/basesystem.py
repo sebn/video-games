@@ -19,14 +19,20 @@
 
 import abc
 
-class BaseSystem():
+from gi.repository import GamesManager
+
+class BaseSystem(GamesManager.System):
 	def __init__(self, gamesdb, system):
+		GamesManager.System.__init__(self, id = system)
 		self.system = system
 		self.gamesdb = gamesdb
 	
 	@abc.abstractmethod
 	def update_db(self):
 		pass
+		
+	def do_get_game_info(self, id):
+		return self.get_game_info(id)
 	
 	@abc.abstractmethod
 	def get_game_info(self, id):

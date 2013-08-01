@@ -32,7 +32,7 @@ class BadnikWindow(Gtk.ApplicationWindow):
 		self.app = app
 		
 		self.set_default_size(800, 600)
-		self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+		self.set_position(Gtk.WindowPosition.CENTER)
 		
 		self.view = MainGameView(app)
 		self.view.show()
