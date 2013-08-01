@@ -24,6 +24,7 @@ from xdg import BaseDirectory
 
 from gamesman import db, GameProcess
 from badnikwindow import BadnikWindow
+from badniklibrary import BadnikLibrary
 
 class BadnikApplication(Gtk.Application):
 	def __init__(self):
@@ -40,7 +41,7 @@ class BadnikApplication(Gtk.Application):
 		self.tosecdir = self.datadir + "/data/tosec"
 		self.srcdir = self.datadir + "/src"
 		
-		self.gamesdb = db.GamesDB(self)
+		self.gamesdb = db.BadnikLibrary(self)
 		
 		self.focused_game = None
 		
@@ -165,7 +166,7 @@ class BadnikApplication(Gtk.Application):
 		time_played = end_time - start_time
 		
 		if return_code == 0 or time_played > 10:
-			self.gamesdb.update_play_time(id, start_time, end_time)
+			self.gamesdb.update_game_play_time(id, start_time, end_time)
 
 if __name__ == '__main__':
 	app = BadnikApplication()

@@ -23,11 +23,11 @@ DESKTOPDIR = $(datadir)/applications
 SOURCES = \
 	src/__init__.py \
 	src/badnik.py \
+	src/badniklibrary.py \
 	src/badnikwindow.py \
 	src/gameview.py \
 	src/main.py \
 	src/gamesman/__init__.py \
-	src/gamesman/db.py \
 	src/gamesman/metadata/__init__.py \
 	src/gamesman/metadata/mobygames.py \
 	src/gamesman/metadata/tosec.py \

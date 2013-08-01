@@ -33,6 +33,15 @@ class BaseSystem(GamesManager.System):
 		
 	def do_get_game_info(self, id):
 		return self.get_game_info(id)
+		
+	def do_get_game_exec(self, id):
+		return self.get_game_exec(id)
+		
+	def do_is_game_available(self, id):
+		return self.is_game_available(id)
+	
+	def do_search_new_games(self):
+		self.update_db()
 	
 	@abc.abstractmethod
 	def get_game_info(self, id):
