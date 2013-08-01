@@ -74,8 +74,9 @@ class BadnikApplication(Gtk.Application):
 	def on_activate(self, data=None):
 		self.window = BadnikWindow(self)
 		self.window.show()
-		self.update_db_async()
 		self.add_window(self.window)
+		
+		self.update_library_async()
 	
 	def _add_actions(self):
 		for action_entry in self._action_entries:
@@ -142,11 +143,13 @@ class BadnikApplication(Gtk.Application):
 			action.state = settings.get_value('view-as')
 		self.settings.connect('changed::view-as', _changed_view_as)
 	
-	def update_db_async(self):
-		Thread(target=self.gamesdb.search_new_games, args=(), kwargs={}).start()
-		#target=self.gamesdb.update_db()
-		#"update_db", self.gamesdb.update_db()
+	def update_library(self):
+		self.gamesdb.search_new_games()
+		# Get metadata
 	
+	def update_library_async(self):
+		Thread(target=self.update_library, args=(), kwargs={}).start()
+		
 	def play_game(self, id=None):
 		id = id if id else self.focused_game
 		if id:
