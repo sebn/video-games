@@ -33,9 +33,17 @@ namespace GamesManager {
 		 * Manage database connections
 		 */
 		
-		protected Gda.Connection
+		protected Gda.Connection?
 		open_connection () {
-			return Gda.Connection.open_from_string (null, get_connection_string(), null, Gda.ConnectionOptions.NONE);
+			// TODO Gda.Connection.open_from_string raise a warning (not caused by get_connection_string)
+			Gda.Connection cnn = null;
+			try {
+				cnn = Gda.Connection.open_from_string (null, get_connection_string(), null, Gda.ConnectionOptions.NONE);
+			}
+			catch (Error e) {
+				
+			}
+			return cnn;
 		}
 		
 		private string
@@ -132,9 +140,8 @@ namespace GamesManager {
 		
 		public GameInfo
 		get_game_info (int id) {
-			var systemid = get_system_name(id);
-			var gameid = get_system_game_id(id);
-			
+			var systemid = get_system_name(id); // Cause warnings
+			var gameid = get_system_game_id(id); // Cause warnings
 			var system = systems.get(systemid);
 			return system.get_game_info(gameid);
 		}

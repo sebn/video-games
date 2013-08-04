@@ -62,18 +62,18 @@ class Desktop(GamesManager.System):
 		
 		if result:
 			entry = DesktopEntry.DesktopEntry(result[1])
-			info = GamesManager.GameInfo()
-			info.set_property("id", id)
-			info.set_property("title", entry.getName())
-			info.set_property("developer", result[2])
-			info.set_property("icon", entry.getIcon())
-			info.set_property("released", result[3])
-			info.set_property("system", self.get_property("id"))
-			info.set_property("genre", result[4])
-			info.set_property("played", result[7])
-			info.set_property("playedlast", result[8])
-			info.set_property("description", result[5])
-			info.set_property("rank", result[6])
+			info = GamesManager.GameInfo(
+			    id = id,
+			    title = entry.getName(),
+			    developer = result[2],
+			    icon = entry.getIcon(),
+			    released = result[3],
+			    system = self.get_property("id"),
+			    genre = result[4],
+			    played = result[7],
+			    playedlast = result[8],
+			    description = result[5],
+			    rank = result[6] )
 		
 		return info
 	
@@ -128,12 +128,16 @@ class Desktop(GamesManager.System):
 		if not (name and system):
 			return
 		print("downloading metadata for", id)
+		print("searching for", name, "on", system, "on Mobygames")
 		urls = mobygames.get_search_results(name, system)
 		db = sqlite3.connect(self.path)
+		print("found results for", name, "on", system, "on Mobygames")
 		if len(urls) > 0:
+			print("getting informations for", name, "on", system, "on Mobygames")
 			info = mobygames.get_game_info(urls[0])
 			db.execute('UPDATE desktop SET developer = ?,released = ?, genre = ?, description = ?, rank = ? WHERE id = ?', [info['developer'], info['released'], info['genre'], info['description'], info['rank'], id])
 			db.commit()
+			print("got informations for", name, "on", system, "on Mobygames")
 			self.get_property("library").emit("game_updated", self.get_global_game_id(id))
 		db.close()
 	

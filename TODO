@@ -10,7 +10,7 @@ Badnik 0.2
 	Workflow and code:
 		Polish the "desktop" system
 		Add more comments
-		Add a way to stop a thread
+		Add a way to stop a thread (the slow ones, searching for metadata)
 
 Badnik 0.3
 	GUI:
@@ -26,10 +26,10 @@ Badnik 0.3
 		Prevent multiple instances of a game to be run
 		Add some basic command line options (help, verbose...)
 		Add internationalization
+		Solve the warnings raised by Gda.Connection.open_from_string
 	
 	Get a proper identity:
 		Get a meaningful name
-		Get a legal icon
 
 Badnik 0.4
 	GUI:

@@ -45,8 +45,6 @@ ICONS = \
 	icons/hicolor/24x24/apps/$(APPNAME).png \
 	icons/hicolor/32x32/apps/$(APPNAME).png \
 	icons/hicolor/48x48/apps/$(APPNAME).png \
-	icons/hicolor/64x64/apps/$(APPNAME).png \
-	icons/hicolor/128x128/apps/$(APPNAME).png \
 	icons/hicolor/256x256/apps/$(APPNAME).png
 
 TOSEC = \
