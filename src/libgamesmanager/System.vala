@@ -20,11 +20,12 @@ namespace GamesManager {
 		public abstract GameInfo get_game_info (int game_id);
 		protected GameInfo _get_game_info (int game_id) {
 			var info = new GameInfo();
-			/*
+		
 			if (library != null) {
 				var cnn = library.open_connection();
 				
-				var datamodel = cnn.execute_select_command ("SELECT games.id, games.title, games.developer, games.icon, games.cover, games.released systems.ref, games.genre, games.played, games.playedlast, games.online, games.description, games.rank, games.players FROM games, systems WHERE games.systemid = systems.id AND games.id = " + game_id.to_string("%i"));
+				//var datamodel = cnn.execute_select_command ("SELECT games.id, games.title, games.developer FROM games, systems WHERE games.systemid = systems.id AND games.id = " + game_id.to_string("%i"));
+				var datamodel = cnn.execute_select_command ("SELECT games.id, games.title, games.developer, games.icon, games.cover, games.released, systems.ref, games.genre, games.played, games.playedlast, games.online, games.description, games.rank, games.players FROM games, systems WHERE games.systemid = systems.id AND games.id = " + game_id.to_string("%i"));
 				
 				if (datamodel.get_n_rows() > 0) {
 					info.id = datamodel.get_value_at(0, 0).get_int();
@@ -47,7 +48,7 @@ namespace GamesManager {
 				}
 				
 				cnn.close();
-			}*/
+			}
 			return info;
 		}
 		

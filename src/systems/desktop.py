@@ -70,7 +70,7 @@ class Desktop(GamesManager.System):
 				self.add_new_game_to_database(entry)
 		
 		print("update desktop end")
-		#self.update_games_metadata()
+		self.update_games_metadata()
 	
 	def add_new_game_to_database (self, uri):
 		db = sqlite3.connect(self.get_property("library").path)
@@ -129,7 +129,7 @@ class Desktop(GamesManager.System):
 		if len(urls) > 0:
 			print("getting informations for", name, "on", system, "on Mobygames")
 			info = mobygames.get_game_info(urls[0])
-			db.execute('UPDATE desktop SET developer = ?,released = ?, genre = ?, description = ?, rank = ? WHERE id = ?', [info['developer'], info['released'], info['genre'], info['description'], info['rank'], id])
+			db.execute('UPDATE games SET developer = ?,released = ?, genre = ?, description = ?, rank = ? WHERE id = ?', [info['developer'], info['released'], info['genre'], info['description'], info['rank'], id])
 			db.commit()
 			print("got informations for", name, "on", system, "on Mobygames")
 			self.get_property("library").emit("game_updated", id)
