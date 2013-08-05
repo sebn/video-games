@@ -18,7 +18,6 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 from gi.repository import GObject
-import sqlite3
 import os.path
 
 from gi.repository import GamesManager
@@ -31,10 +30,10 @@ from systems import snes
 class BadnikLibrary(GamesManager.Library):
 	'''A games dedicated database'''
 	def __init__(self, app):
-		GamesManager.Library.__init__(self, db_name = "games2", db_dir = app.savedatadir)
+		GamesManager.Library.__init__(self, db_name = "games", db_dir = app.savedatadir)
 		
 		self.app = app
-		self.path = os.path.join(self.app.savedatadir, "games2.db")
+		self.path = os.path.join(self.app.savedatadir, "games.db")
 		
 		# Init the TOSEC databases
 		self.tosec = tosec.TOSEC(self.app.savedatadir)
@@ -43,7 +42,7 @@ class BadnikLibrary(GamesManager.Library):
 		system_list = []
 		system_list.append(desktop.Desktop(self))
 		#system_list.append(snes.SNES(self))
-		system_list.append(megadrive.MegaDrive(self))
+		#system_list.append(megadrive.MegaDrive(self))
 		
 		for system in system_list:
 			self.add_system(system)

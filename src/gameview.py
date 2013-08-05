@@ -96,12 +96,11 @@ class MainGameView(Gtk.Box):
 		if (not self.has_game(id)) and self.app.gamesdb.is_game_available(id):
 			print("maingameview: adding game", id)
 			info = self.app.gamesdb.get_game_info(id)
-			gameid = info.get_property("id")
+			title = info.get_property("title")
 			developer = info.get_property("developer")
-			name = info.get_property("title")
 			icon = info.get_pixbuf(128, 0)
 			
-			self.view.get_model().append([str(id), "", name, developer, icon, int(time.time()), False])
+			self.view.get_model().append([str(id), "", title, developer, icon, int(time.time()), False])
 	
 	def set_view(self, settings=None, setting=None):
 		value = self.app.settings.get_value('view-as').get_string()

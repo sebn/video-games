@@ -35,89 +35,83 @@ class Desktop(GamesManager.System):
 	               "lutris.desktop",
 	               "badnik.desktop" ]
 	
-	def __init__(self, gamesdb):
-		GamesManager.System.__init__(self, id = "desktop")
-		self.path = gamesdb.path
-		db = sqlite3.connect(self.path)
-		db.execute('''CREATE TABLE IF NOT EXISTS desktop
-		              (
-		                id INTEGER PRIMARY KEY,
-		                path TEXT,
-		                developer TEXT,
-		                released TEXT,
-		                genre TEXT,
-		                description TEXT,
-		                rank TEXT
-		              )''')
-		db.close()
+	def __init__(self, library):
+		GamesManager.System.__init__(self, reference = "desktop")
 	
 	def do_get_game_info(self, id):
-		'''Return a GameInfo object representing the game or None if an error occured.'''
-		db = sqlite3.connect(self.path)
-		c = db.cursor()
-		c.execute('SELECT desktop.id, desktop.path, desktop.developer, desktop.released, desktop.genre, desktop.description, desktop.rank, games.time_played, games.last_played FROM games, desktop WHERE games.gameid = desktop.id AND desktop.id = ?', [id])
-		result = c.fetchone()
+		info = GamesManager.System._get_game_info(self, id)
+		
+		uri = None
+		db = sqlite3.connect(self.get_property("library").path)
+		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
+			uri = row[0]
+			break
 		db.close()
-		info = None
+		entry = DesktopEntry.DesktopEntry(uri)
 		
-		if result:
-			entry = DesktopEntry.DesktopEntry(result[1])
-			info = GamesManager.GameInfo(
-			    id = id,
-			    title = entry.getName(),
-			    developer = result[2],
-			    icon = entry.getIcon(),
-			    released = result[3],
-			    system = self.get_property("id"),
-			    genre = result[4],
-			    played = result[7],
-			    playedlast = result[8],
-			    description = result[5],
-			    rank = result[6] )
-		
+		info.set_property("system", self.get_property("reference"))
+		info.set_property("title", entry.getName())
+		info.set_property("icon", entry.getIcon())
 		return info
 	
 	def do_search_new_games(self):
 		print("update desktop start")
-		db = sqlite3.connect(self.path)
 		for entry in self.get_game_desktop_entries():
 			# Check the game's existence in the table
-			id = None
-			for row in db.execute('SELECT id FROM ' + self.get_property("id") + ' WHERE path = ?', [entry]):
-				id = row[0]
+			exists = False
 			
-			# If the game isn't in the table: add it
-			if not id:
-				db.execute('INSERT INTO ' + self.get_property("id") + ' (id, path) VALUES (NULL, ?)', [entry])
-				for row in db.execute('SELECT id FROM ' + self.get_property("id") + ' WHERE path = ?', [entry]):
-					id = row[0]
-				db.execute('INSERT INTO games VALUES (NULL, ?, ?, 0, 0)', [id, self.get_property("id")])
-				db.commit()
-				self.get_property("library").emit("game_updated", self.get_global_game_id(id))
-		db.close()
+			db = sqlite3.connect(self.get_property("library").path)
+			for row in db.execute('SELECT * FROM uris WHERE uri = ?', [entry]):
+				exists = True
+				break
+			db.close()
+			
+			if not exists:
+				self.add_new_game_to_database(entry)
+		
 		print("update desktop end")
-		self.update_games_metadata()
+		#self.update_games_metadata()
+	
+	def add_new_game_to_database (self, uri):
+		db = sqlite3.connect(self.get_property("library").path)
+		# obtenir un identifiant unique de jeu : la racine du nom de fichier du .desktop
+		gameid = None
+		gameref = path.basename(uri).split(".")[0]
+		
+		# Getting the game id
+		for row in db.execute('SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = ?', [gameref]):
+			gameid = row[0]
+			break
+		
+		if not gameid:
+			# Adding the game
+			db.execute('INSERT INTO games (id, systemid, ref, played, playedlast) VALUES (NULL, ?, ?, ?, ?)', [self.get_property("id"), gameref, 0, 0])
+			
+			# Getting the new game id
+			for row in db.execute('SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = ?', [gameref]):
+				gameid = row[0]
+				break
+		
+		# Adding the URI
+		db.execute('INSERT INTO uris (id, uri, gameid) VALUES (NULL, ?, ?)', [uri, gameid])
+		
+		db.commit()
+		
+		self.get_property("library").emit("game_updated", gameid)
+		
+		db.close()
 	
 	def update_games_metadata(self):
 		for id in self.get_games_id():
 			self.download_metadata(id)
 	
 	def get_games_id(self):
-		db = sqlite3.connect(self.path)
+		db = sqlite3.connect(self.get_property("library").path)
 		ids = []
-		for row in db.execute('SELECT id FROM desktop'):
+		for row in db.execute('SELECT id FROM games WHERE systemid = ?', [self.get_property("id")]):
 			ids.append(row[0])
 		db.close()
 		return ids
-	
-	def get_global_game_id(self, id):
-		db = sqlite3.connect(self.path)
-		gid = None
-		for row in db.execute('SELECT id FROM games WHERE gameid = ? AND system = "desktop"', [id]):
-			gid = row[0]
-			break
-		db.close()
-		return gid
 	
 	def download_metadata(self, id):
 		print("try to download metadata for", id)
@@ -130,7 +124,7 @@ class Desktop(GamesManager.System):
 		print("downloading metadata for", id)
 		print("searching for", name, "on", system, "on Mobygames")
 		urls = mobygames.get_search_results(name, system)
-		db = sqlite3.connect(self.path)
+		db = sqlite3.connect(self.get_property("library").path)
 		print("found results for", name, "on", system, "on Mobygames")
 		if len(urls) > 0:
 			print("getting informations for", name, "on", system, "on Mobygames")
@@ -138,22 +132,22 @@ class Desktop(GamesManager.System):
 			db.execute('UPDATE desktop SET developer = ?,released = ?, genre = ?, description = ?, rank = ? WHERE id = ?', [info['developer'], info['released'], info['genre'], info['description'], info['rank'], id])
 			db.commit()
 			print("got informations for", name, "on", system, "on Mobygames")
-			self.get_property("library").emit("game_updated", self.get_global_game_id(id))
+			self.get_property("library").emit("game_updated", id)
 		db.close()
 	
 	def do_is_game_available(self, id):
-		db = sqlite3.connect(self.path)
+		db = sqlite3.connect(self.get_property("library").path)
 		exists = False
-		for row in db.execute('SELECT path FROM desktop WHERE id = ?', [id]):
+		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
 			exists = path.exists(row[0])
 			break
 		db.close()
 		return exists
 	
 	def do_get_game_exec(self, id):
-		db = sqlite3.connect(self.path)
+		db = sqlite3.connect(self.get_property("library").path)
 		value = None
-		for row in db.execute('SELECT path FROM desktop WHERE id = ?', [id]):
+		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
 			value = DesktopEntry.DesktopEntry(row[0]).getExec()
 		db.close()
 		return value

@@ -4,9 +4,52 @@ namespace GamesManager {
 		public string db_name { construct; get; }
 		public string db_dir { construct; get; }
 		
+		private const string systems_table = "
+		CREATE TABLE IF NOT EXISTS systems (
+			id INTEGER PRIMARY KEY,
+			ref TEXT, 
+			name TEXT,
+			UNIQUE (id, ref)
+		)";
+		
+		/* Add constraints :
+		   // favuriid->uris.gameid == id
+		   0 <= rank <= 1
+		 */
+		private const string games_table = "
+		CREATE TABLE IF NOT EXISTS games (
+			id INTEGER PRIMARY KEY,
+			systemid INTEGER,
+			ref TEXT,
+			played REAL,
+			playedlast REAL,
+			datamtime REAL,
+			title TEXT,
+			developer TEXT,
+			icon TEXT,
+			cover TEXT,
+			description TEXT,
+			released REAL,
+			genre TEXT,
+			players INTEGER,
+			online TEXT,
+			rank REAL,
+			FOREIGN KEY(systemid) REFERENCES systems(id)
+			UNIQUE (id, systemid, ref)
+		)";
+		
+		private const string uris_table = "
+		CREATE TABLE IF NOT EXISTS uris (
+			id INTEGER PRIMARY KEY,
+			uri TEXT,
+			gameid INTEGER,
+			FOREIGN KEY(gameid) REFERENCES games(id),
+			UNIQUE (id, uri)
+		)";
+		
 		private HashTable<string, System> systems;
 		
-		public signal void game_updated (int id);
+		public signal void game_updated (int game_id);
 		
 		public
 		Library (string db_name, string db_dir) {
@@ -17,23 +60,19 @@ namespace GamesManager {
 			systems = new HashTable<string, System> (str_hash, str_equal);
 			
 			var cnn = open_connection();
-			string games_table = "
-			CREATE TABLE IF NOT EXISTS games (
-				id INTEGER PRIMARY KEY,
-				gameid INTEGER,
-				system TEXT,
-				time_played REAL,
-				last_played REAL,
-				UNIQUE (id, system)
-			)";
+			
+			cnn.execute_non_select_command (systems_table);
 			cnn.execute_non_select_command (games_table);
+			cnn.execute_non_select_command (uris_table);
+			
+			cnn.close();
 		}
 		
 		/*
 		 * Manage database connections
 		 */
 		
-		protected Gda.Connection?
+		public Gda.Connection?
 		open_connection () {
 			// TODO Gda.Connection.open_from_string raise a warning (not caused by get_connection_string)
 			Gda.Connection cnn = null;
@@ -51,55 +90,25 @@ namespace GamesManager {
 			return string.join("", this.provider, "://DB_DIR=", this.db_dir, ";DB_NAME=", this.db_name);
 		}
 		
-		public void
-		print_games () {
-			var cnn = open_connection();
-			var datamodel = cnn.execute_select_command ("SELECT * FROM games");
-			int columns = datamodel.get_n_columns();
-			int rows = datamodel.get_n_rows();
-			for (int row = 0 ; row < rows ; row++ ) {
-				var id = datamodel.get_value_at(0, row).get_int();
-				var gameid = datamodel.get_value_at(1, row).get_int();
-				var system = datamodel.get_value_at(2, row).get_string();
-				var time_played = datamodel.get_value_at(3, row).get_double();
-				var last_played = datamodel.get_value_at(4, row).get_double();
-			}
-			cnn.close();
-		}
-		
 		/*
 		 * Manage systems
 		 */
 		
 		public void
 		add_system (System system) {
-			if (systems.contains(system.id)) {
+			if (systems.contains(system.reference)) {
 				// Trow error : A Library can't contain two systems with the same id
 			}
 			else {
-				systems.insert(system.id, system);
+				systems.insert(system.reference, system);
 				system.library = this;
 			}
 		}
 		
-		private int
-		get_system_game_id (int id) {
-			var cnn = open_connection();
-			var datamodel = cnn.execute_select_command ("SELECT gameid FROM games WHERE id = " + id.to_string("%i"));
-			
-			if (datamodel.get_n_rows() > 0) {
-				return datamodel.get_value_at(0, 0).get_int();
-			}
-			else {
-				// Throw error
-				return 0;
-			}
-		}
-		
 		private string
-		get_system_name (int id) {
+		get_system_reference (int game_id) {
 			var cnn = open_connection();
-			var datamodel = cnn.execute_select_command ("SELECT system FROM games WHERE id = " + id.to_string("%i"));
+			var datamodel = cnn.execute_select_command ("SELECT systems.ref FROM games, systems WHERE games.systemid = systems.id AND games.id = " + game_id.to_string("%i"));
 			
 			if (datamodel.get_n_rows() > 0) {
 				return datamodel.get_value_at(0, 0).get_string();
@@ -139,29 +148,24 @@ namespace GamesManager {
 		}
 		
 		public GameInfo
-		get_game_info (int id) {
-			var systemid = get_system_name(id); // Cause warnings
-			var gameid = get_system_game_id(id); // Cause warnings
-			var system = systems.get(systemid);
-			return system.get_game_info(gameid);
+		get_game_info (int game_id) {
+			var system_ref = get_system_reference(game_id);
+			var system = systems.get(system_ref);
+			return system.get_game_info(game_id);
 		}
 		
 		public string
-		get_game_exec (int id) {
-			var systemid = get_system_name(id);
-			var gameid = get_system_game_id(id);
-			
-			var system = systems.get(systemid);
-			return system.get_game_exec(gameid);
+		get_game_exec (int game_id) {
+			var system_ref = get_system_reference(game_id);
+			var system = systems.get(system_ref);
+			return system.get_game_exec(game_id);
 		}
 		
 		public bool
-		is_game_available (int id) {
-			var systemid = get_system_name(id);
-			var gameid = get_system_game_id(id);
-			
-			var system = systems.get(systemid);
-			return system.is_game_available(gameid);
+		is_game_available (int game_id) {
+			var system_ref = get_system_reference(game_id);
+			var system = systems.get(system_ref);
+			return system.is_game_available(game_id);
 		}
 		
 		/*
@@ -169,17 +173,17 @@ namespace GamesManager {
 		 */
 		
 		public void
-		update_game_play_time (int id, double start, double end) {
+		update_game_play_time (int game_id, double start, double end) {
 			var cnn = open_connection();
-			var datamodel = cnn.execute_select_command ("SELECT time_played FROM games WHERE id = " + id.to_string("%i"));
+			var datamodel = cnn.execute_select_command ("SELECT played FROM games WHERE id = " + game_id.to_string("%i"));
 			
 			if (datamodel.get_n_rows() > 0) {
 				var time_played =  datamodel.get_value_at(0, 0).get_double();
 				time_played += end - start;
 				
-				cnn.execute_non_select_command ("UPDATE games SET time_played = " + time_played.to_string() + ", last_played = " + end.to_string() + " WHERE id = " + id.to_string("%i"));
+				cnn.execute_non_select_command ("UPDATE games SET played = " + time_played.to_string() + ", playedlast = " + end.to_string() + " WHERE id = " + game_id.to_string("%i"));
 				
-				this.game_updated (id);
+				this.game_updated (game_id);
 			}
 			else {
 				// Throw error
