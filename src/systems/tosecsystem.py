@@ -17,24 +17,24 @@
 #    
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
-from systems.basesystem import BaseSystem
+from gi.repository import GamesManager
 
-class TOSECSystem(BaseSystem):
+class TOSECSystem(GamesManager.System):
 	def __init__(self, gamesdb, system):
-		BaseSystem.__init__(self, gamesdb, system)
-		tosecdata = gamesdb.app.tosecdir + "/" + system + ".dat"
-		gamesdb.tosec.parse_file(tosecdata, self.system)
+		GamesManager.System.__init__(self, reference = system)
+		tosecdata = gamesdb.app.tosecdir + "/" + self.get_property("reference") + ".dat"
+		gamesdb.tosec.parse_file(tosecdata, self.get_property("reference"))
 	
 	def get_game_name(self, id):
 		path = None
-		for row in self.gamesdb.db.execute('SELECT path FROM ' + self.system + ' WHERE id = ?', [id]):
+		for row in self.get_property("library").db.execute('SELECT path FROM ' + self.get_property("reference") + ' WHERE id = ?', [id]):
 			path = row[0]
 		
 		if path:
-			return self.gamesdb.tosec.get_game_title(path)
+			return self.get_property("library").tosec.get_game_title(path)
 		else:
 			return id
 	
 	def get_game_icon(self, id, size, flag):
-		return self.gamesdb.app.iconsdir + "/" + self.system + ".png"
+		return self.get_property("library").app.iconsdir + "/" + self.get_property("reference") + ".png"
 	

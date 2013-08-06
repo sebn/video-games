@@ -96,12 +96,27 @@ namespace GamesManager {
 		
 		public void
 		add_system (System system) {
-			if (systems.contains(system.reference)) {
-				// Trow error : A Library can't contain two systems with the same id
-			}
-			else {
+			if (! systems.contains(system.reference)) {
 				systems.insert(system.reference, system);
-				system.library = this;
+				
+				var cnn = open_connection();
+				var datamodel = cnn.execute_select_command ("SELECT id FROM systems WHERE ref = '" + system.reference + "'");
+				
+				if (datamodel.get_n_rows() > 0) {
+					system.id = datamodel.get_value_at(0, 0).get_int();
+				}
+				else {
+					cnn.execute_non_select_command ("INSERT INTO systems (id, ref) VALUES (NULL, '" + system.reference + "')");
+					datamodel = cnn.execute_select_command ("SELECT id FROM systems WHERE ref = '" + system.reference + "'");
+					if (datamodel.get_n_rows() > 0) {
+						system.id = datamodel.get_value_at(0, 0).get_int();
+					}
+					else {
+						stdout.printf("error: can't get the system id\n");
+					}
+				}
+				
+				cnn.close();
 			}
 		}
 		
@@ -121,9 +136,29 @@ namespace GamesManager {
 		
 		public void
 		search_new_games () {
+			var standard = new List<System>();
+			var applications = new List<System>();
 			foreach (System system in systems.get_values()) {
-				system.search_new_games();
+				switch (system.game_search_type) {
+				case GameSearchType.APPLICATIONS:
+					applications.append(system);
+					break;
+				case GameSearchType.STANDARD:
+					standard.append(system);
+					break;
+				}
 			}
+			if (standard.length() > 0) {
+				foreach (System system in standard) {
+					//system.search_new_games();
+				}
+			}
+			if (applications.length() > 0) {
+				foreach (System system in standard) {
+					//system.search_new_games();
+				}
+			}
+			//
 		}
 		
 		/*
@@ -151,21 +186,21 @@ namespace GamesManager {
 		get_game_info (int game_id) {
 			var system_ref = get_system_reference(game_id);
 			var system = systems.get(system_ref);
-			return system.get_game_info(game_id);
+			return system.get_game_info(this, game_id);
 		}
 		
 		public string
 		get_game_exec (int game_id) {
 			var system_ref = get_system_reference(game_id);
 			var system = systems.get(system_ref);
-			return system.get_game_exec(game_id);
+			return system.get_game_exec(this, game_id);
 		}
 		
 		public bool
 		is_game_available (int game_id) {
 			var system_ref = get_system_reference(game_id);
 			var system = systems.get(system_ref);
-			return system.is_game_available(game_id);
+			return system.is_game_available(this, game_id);
 		}
 		
 		/*
@@ -190,6 +225,76 @@ namespace GamesManager {
 			}
 			
 			cnn.close();
+		}
+		
+		private void add_new_game (System system, string uri) {
+			if (system.is_a_game(uri)) {
+				var reference = system.get_game_reference_for_uri(uri);
+				if (!get_game_exists_for_reference(system, reference)) {
+					var cnn = open_connection();
+					cnn.execute_non_select_command ("INSERT INTO games (id, systemid, ref, played, playedlast) VALUES (NULL, " + system.id.to_string("%i") + ", '" + reference + "', 0, 0)");
+					cnn.close();
+				}
+				if (!get_uri_exists(uri)) {
+					var game_id = get_game_id_for_reference(system, reference);
+					add_uri_for_game(game_id, uri);
+					game_updated(game_id);
+				}
+			}
+		}
+		
+		private bool get_game_exists_for_reference (System system, string game_reference) {
+			var cnn = open_connection();
+			var datamodel = cnn.execute_select_command ("SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = '" + game_reference + "' AND systems.id = " + system.id.to_string("%i"));
+			var exists = (datamodel.get_n_rows() == 0);
+			cnn.close();
+			return exists;
+		}
+		
+		private int get_game_id_for_reference (System system, string game_reference) throws Error {
+			var cnn = open_connection();
+			var datamodel = cnn.execute_select_command ("SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = '" + game_reference + "' AND systems.id = " + system.id.to_string("%i"));
+			if (datamodel.get_n_rows() == 0) {
+				cnn.close();
+				//throw new Error("Lol");
+				return 0;
+			}
+			else {
+				var game_id = datamodel.get_value_at(0, 0).get_int();
+				cnn.close();
+				return game_id;
+			}
+		}
+		
+		
+		
+		public string get_game_uri (int game_id) {
+			var uri = "";
+			
+			var cnn = open_connection();
+			var datamodel = cnn.execute_select_command ("SELECT uri FROM uris WHERE gameid = " + game_id.to_string("%i"));
+			
+			if (datamodel.get_n_rows() > 0) {
+				uri = datamodel.get_value_at(0, 0).get_string();
+			}
+			
+			cnn.close();
+			
+			return uri;
+		}
+		
+		private void add_uri_for_game (int game_id, string uri) {
+			var cnn = open_connection();
+			cnn.execute_non_select_command ("INSERT INTO uris (id, uri, gameid) VALUES (NULL, '" + uri + "', " + game_id.to_string("%i") + ")");
+			cnn.close();
+		}
+		
+		protected bool get_uri_exists (string uri) {
+			var cnn = open_connection();
+			var datamodel = cnn.execute_select_command ("SELECT id FROM uri WHERE uri = '" + uri + "'");
+			var exists = (datamodel.get_n_rows() != 0);
+			cnn.close();
+			return exists;
 		}
 	}
 }

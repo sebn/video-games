@@ -36,17 +36,12 @@ class Desktop(GamesManager.System):
 	               "badnik.desktop" ]
 	
 	def __init__(self, library):
-		GamesManager.System.__init__(self, reference = "desktop")
+		GamesManager.System.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
-	def do_get_game_info(self, id):
-		info = GamesManager.System._get_game_info(self, id)
+	def do_get_game_info(self, library, id):
+		info = GamesManager.System._get_game_info(self, library, id)
 		
-		uri = None
-		db = sqlite3.connect(self.get_property("library").path)
-		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			uri = row[0]
-			break
-		db.close()
+		uri = library.get_game_uri(id)
 		entry = DesktopEntry.DesktopEntry(uri)
 		
 		info.set_property("system", self.get_property("reference"))
@@ -54,66 +49,48 @@ class Desktop(GamesManager.System):
 		info.set_property("icon", entry.getIcon())
 		return info
 	
-	def do_search_new_games(self):
-		print("update desktop start")
+	def do_is_a_game(self, uri):
+		def is_a_game_category(category):
+			"""Return True if the given category can be considered as a game related category, False otherwise"""
+			return category == "Game"
+		
+		def is_a_game_entry(file):
+			"""Return True if the given entry path refer to a game related desktop entry, False otherwise"""
+			try:
+				entry = DesktopEntry.DesktopEntry(file)
+				for category in entry.getCategories():
+					if is_a_game_category(category):
+						return True
+				return False
+			except:
+				return False
+		
+		return is_a_game_entry(uri)
+	
+	def do_get_game_reference_for_uri(self, uri):
+		return path.basename(uri).split(".")[0]
+	
+	def do_search_new_games(self, library):
+		print("desktop: do_search_new_games start")
 		for entry in self.get_game_desktop_entries():
-			# Check the game's existence in the table
-			exists = False
-			
-			db = sqlite3.connect(self.get_property("library").path)
-			for row in db.execute('SELECT * FROM uris WHERE uri = ?', [entry]):
-				exists = True
-				break
-			db.close()
-			
-			if not exists:
-				self.add_new_game_to_database(entry)
+			self.add_new_game(entry)
 		
-		print("update desktop end")
-		self.update_games_metadata()
+		print("desktop: do_search_new_games end")
+		self.update_games_metadata(library)
 	
-	def add_new_game_to_database (self, uri):
-		db = sqlite3.connect(self.get_property("library").path)
-		# obtenir un identifiant unique de jeu : la racine du nom de fichier du .desktop
-		gameid = None
-		gameref = path.basename(uri).split(".")[0]
-		
-		# Getting the game id
-		for row in db.execute('SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = ?', [gameref]):
-			gameid = row[0]
-			break
-		
-		if not gameid:
-			# Adding the game
-			db.execute('INSERT INTO games (id, systemid, ref, played, playedlast) VALUES (NULL, ?, ?, ?, ?)', [self.get_property("id"), gameref, 0, 0])
-			
-			# Getting the new game id
-			for row in db.execute('SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = ?', [gameref]):
-				gameid = row[0]
-				break
-		
-		# Adding the URI
-		db.execute('INSERT INTO uris (id, uri, gameid) VALUES (NULL, ?, ?)', [uri, gameid])
-		
-		db.commit()
-		
-		self.get_property("library").emit("game_updated", gameid)
-		
-		db.close()
-	
-	def update_games_metadata(self):
+	def update_games_metadata(self, library):
 		for id in self.get_games_id():
-			self.download_metadata(id)
+			self.download_metadata(library, id)
 	
 	def get_games_id(self):
-		db = sqlite3.connect(self.get_property("library").path)
+		db = sqlite3.connect(library.path)
 		ids = []
 		for row in db.execute('SELECT id FROM games WHERE systemid = ?', [self.get_property("id")]):
 			ids.append(row[0])
 		db.close()
 		return ids
 	
-	def download_metadata(self, id):
+	def download_metadata(self, library, id):
 		print("try to download metadata for", id)
 		info = self.do_get_game_info(id)
 		if not info:
@@ -124,7 +101,7 @@ class Desktop(GamesManager.System):
 		print("downloading metadata for", id)
 		print("searching for", name, "on", system, "on Mobygames")
 		urls = mobygames.get_search_results(name, system)
-		db = sqlite3.connect(self.get_property("library").path)
+		db = sqlite3.connect(library.path)
 		print("found results for", name, "on", system, "on Mobygames")
 		if len(urls) > 0:
 			print("getting informations for", name, "on", system, "on Mobygames")
@@ -132,11 +109,11 @@ class Desktop(GamesManager.System):
 			db.execute('UPDATE games SET developer = ?,released = ?, genre = ?, description = ?, rank = ? WHERE id = ?', [info['developer'], info['released'], info['genre'], info['description'], info['rank'], id])
 			db.commit()
 			print("got informations for", name, "on", system, "on Mobygames")
-			self.get_property("library").emit("game_updated", id)
+			library.emit("game_updated", id)
 		db.close()
 	
-	def do_is_game_available(self, id):
-		db = sqlite3.connect(self.get_property("library").path)
+	def do_is_game_available(self, library, id):
+		db = sqlite3.connect(library.path)
 		exists = False
 		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
 			exists = path.exists(row[0])
@@ -144,8 +121,8 @@ class Desktop(GamesManager.System):
 		db.close()
 		return exists
 	
-	def do_get_game_exec(self, id):
-		db = sqlite3.connect(self.get_property("library").path)
+	def do_get_game_exec(self, library, id):
+		db = sqlite3.connect(library.path)
 		value = None
 		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
 			value = DesktopEntry.DesktopEntry(row[0]).getExec()
@@ -165,21 +142,6 @@ class Desktop(GamesManager.System):
 			
 			return app_dirs
 		
-		def is_a_game_category(category):
-			"""Return True if the given category can be considered as a game related category, False otherwise"""
-			return category == "Game"
-		
-		def is_a_game_entry(file):
-			"""Return True if the given entry path refer to a game related desktop entry, False otherwise"""
-			try:
-				entry = DesktopEntry.DesktopEntry(file)
-				for category in entry.getCategories():
-					if is_a_game_category(category):
-						return True
-				return False
-			except:
-				return False
-		
 		def is_black_listed(file):
 			for name in Desktop.BLACK_LIST:
 				if file == name:
@@ -193,7 +155,7 @@ class Desktop(GamesManager.System):
 				for file in files:
 					if not is_black_listed(file):
 						file = path.join(root, file)
-						if is_a_game_entry(file):
+						if self.is_a_game(file):
 							game_entries.append(file)
 		
 		return game_entries

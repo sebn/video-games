@@ -28,74 +28,48 @@ import sqlite3
 class MegaDrive(TOSECSystem):
 	def __init__(self, gamesdb):
 		TOSECSystem.__init__(self, gamesdb, "megadrive")
-		db = sqlite3.connect(self.gamesdb.path)
-		db.execute('''CREATE TABLE IF NOT EXISTS ''' + self.system + '''
-				          (
-				            id INTEGER PRIMARY KEY,
-				            path TEXT
-				          )''')
-		db.commit()
-		db.close()
 	
-	def do_get_game_info(self, id):
-		'''Return a GameInfo object representing the game or None if an error occured.'''
-		db = sqlite3.connect(self.gamesdb.path)
-		c = db.cursor()
-		c.execute('SELECT megadrive.id, megadrive.path, games.time_played, games.last_played FROM games, megadrive WHERE games.gameid = megadrive.id AND megadrive.id = ?', [id])
-		result = c.fetchone()
-		db.close()
-		info = None
+	def do_get_game_info(self, library, id):
+		info = GamesManager.System._get_game_info(self, id)
 		
-		if result:
-			path = result[1]
-			info = GamesManager.GameInfo()
-			info.set_property("id", id)
-			info.set_property("title", self.gamesdb.tosec.get_game_title(path))
-			info.set_property("cover", self.gamesdb.app.iconsdir + "/" + self.system + ".png")
-			info.set_property("system", self.system)
-			info.set_property("played", result[2])
-			info.set_property("playedlast", result[3])
+		uri = self.get_game_uri(id)
+		
+		info.set_property("title", library.tosec.get_game_title(uri))
+		info.set_property("cover", library.app.iconsdir + "/" + self.get_property("reference") + ".png")
 		
 		return info
 	
-	def update_db(self):
-		db = sqlite3.connect(self.gamesdb.path)
+	def do_get_game_reference_for_uri(self, library, uri):
+		return library.tosec.get_game_title(uri)
+	
+	def do_search_new_games(self):
+		print("update megadrive start")
 		for rom in self.get_roms():
-			id = None
-			for row in db.execute('SELECT id FROM ' + self.system + ' WHERE path = ?', [rom]):
-				id = row[0]
-			
-			# Search in the games table
-			if not id:
-				db.execute('INSERT INTO ' + self.system + ' VALUES (NULL, ?)', [rom])
-				for row in db.execute('SELECT id FROM ' + self.system + ' WHERE path = ?', [rom]):
-					id = row[0]
-				
-				db.execute('INSERT INTO games VALUES (NULL, ?, ?, 0, 0)', [id, self.system])
-		db.commit()
-		db.close
+			self.add_new_game(rom)
+		
+		print("update megadrive end")
+		#self.update_games_metadata()
 	
 	def get_roms(self):
 		roms = []
 		for root, dirs, files in walk(path.expanduser("~")):
 			for file in files:
 				file = path.join(root, file)
-				if self.is_rom(file):
+				if self.is_a_game(file):
 					roms.append(file)
 		return roms
 	
-	def is_rom(self, file):
-		return has_suffix(file, "md")
+	def do_is_a_game(self, uri):
+		return has_suffix(uri, "md")
 	
-	def is_game_available(self, id):
-		return True
-		db = sqlite3.connect(self.gamesdb.path)
+	def do_is_game_available(self, library, id):
+		db = sqlite3.connect(library.path)
 		exists = False
-		for row in db.execute('SELECT path FROM megadrive WHERE id = ?', [id]):
+		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
 			exists = path.exists(row[0])
 			break
 		db.close()
 		return exists
 	
-	def get_game_exec(self, id):
-		return ""
+	def do_get_game_exec(self, library, id):
+		return 'gens --game "' + self.get_game_uri(id) + '"'

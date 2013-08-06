@@ -31,7 +31,6 @@ SOURCES = \
 	src/metadata/mobygames.py \
 	src/metadata/tosec.py \
 	src/systems/__init__.py \
-	src/systems/basesystem.py \
 	src/systems/tosecsystem.py \
 	src/systems/desktop.py \
 	src/systems/megadrive.py \
