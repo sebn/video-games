@@ -106,6 +106,7 @@ namespace GamesManager {
 					system.id = datamodel.get_value_at(0, 0).get_int();
 				}
 				else {
+					stdout.printf("Add system %s to the DB\n", system.reference);
 					cnn.execute_non_select_command ("INSERT INTO systems (id, ref) VALUES (NULL, '" + system.reference + "')");
 					datamodel = cnn.execute_select_command ("SELECT id FROM systems WHERE ref = '" + system.reference + "'");
 					if (datamodel.get_n_rows() > 0) {
@@ -138,6 +139,7 @@ namespace GamesManager {
 		search_new_games () {
 			var standard = new List<System>();
 			var applications = new List<System>();
+			
 			foreach (System system in systems.get_values()) {
 				switch (system.game_search_type) {
 				case GameSearchType.APPLICATIONS:
@@ -148,17 +150,46 @@ namespace GamesManager {
 					break;
 				}
 			}
-			if (standard.length() > 0) {
-				foreach (System system in standard) {
-					//system.search_new_games();
-				}
+			
+			if (standard.length() > 0) {/*
+				foreach (File file) {
+					foreach (System system in standard) {
+						add_new_game(system, file);
+					}
+				}*/
 			}
+			
 			if (applications.length() > 0) {
-				foreach (System system in standard) {
-					//system.search_new_games();
+				var application_dirs = new List<File>();
+				
+				application_dirs.append (File.new_for_path(Environment.get_user_data_dir()).get_child("applications"));
+				
+				foreach (string system_data_dir in Environment.get_system_data_dirs()) {
+					application_dirs.append (File.new_for_path(system_data_dir).get_child("applications"));
+				}
+				
+				foreach (File application_dir in application_dirs) {
+					if (application_dir.query_exists())
+						search_new_games_in_path(applications, application_dir);
 				}
 			}
-			//
+		}
+		
+		private void
+		search_new_games_in_path (List<System> systems, File file) {
+			foreach (System system in systems)
+				add_new_game (system, file.get_uri ());
+			
+			var file_type = file.query_file_type (FileQueryInfoFlags.NONE);
+			
+			if (file_type == FileType.DIRECTORY) {
+				var enumerator = file.enumerate_children (FileAttribute.STANDARD_NAME, 0);
+				
+				FileInfo file_info;
+				while ((file_info = enumerator.next_file ()) != null) {
+					search_new_games_in_path (systems, file.get_child (file_info.get_name ()));
+				}
+			}
 		}
 		
 		/*
@@ -227,11 +258,13 @@ namespace GamesManager {
 			cnn.close();
 		}
 		
-		private void add_new_game (System system, string uri) {
+		private void
+		add_new_game (System system, string uri) {
 			if (system.is_a_game(uri)) {
 				var reference = system.get_game_reference_for_uri(uri);
 				if (!get_game_exists_for_reference(system, reference)) {
 					var cnn = open_connection();
+					stdout.printf("Add game %s for system %s to the DB\n", reference, system.reference);
 					cnn.execute_non_select_command ("INSERT INTO games (id, systemid, ref, played, playedlast) VALUES (NULL, " + system.id.to_string("%i") + ", '" + reference + "', 0, 0)");
 					cnn.close();
 				}
@@ -243,15 +276,17 @@ namespace GamesManager {
 			}
 		}
 		
-		private bool get_game_exists_for_reference (System system, string game_reference) {
+		private bool
+		get_game_exists_for_reference (System system, string game_reference) {
 			var cnn = open_connection();
 			var datamodel = cnn.execute_select_command ("SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = '" + game_reference + "' AND systems.id = " + system.id.to_string("%i"));
-			var exists = (datamodel.get_n_rows() == 0);
+			var exists = (datamodel.get_n_rows() != 0);
 			cnn.close();
 			return exists;
 		}
 		
-		private int get_game_id_for_reference (System system, string game_reference) throws Error {
+		private int
+		get_game_id_for_reference (System system, string game_reference) throws Error {
 			var cnn = open_connection();
 			var datamodel = cnn.execute_select_command ("SELECT games.id FROM games, systems WHERE games.systemid = systems.id AND games.ref = '" + game_reference + "' AND systems.id = " + system.id.to_string("%i"));
 			if (datamodel.get_n_rows() == 0) {
@@ -285,13 +320,14 @@ namespace GamesManager {
 		
 		private void add_uri_for_game (int game_id, string uri) {
 			var cnn = open_connection();
+			stdout.printf("Add uri %s to game %i to the DB\n", uri, game_id);
 			cnn.execute_non_select_command ("INSERT INTO uris (id, uri, gameid) VALUES (NULL, '" + uri + "', " + game_id.to_string("%i") + ")");
 			cnn.close();
 		}
 		
 		protected bool get_uri_exists (string uri) {
 			var cnn = open_connection();
-			var datamodel = cnn.execute_select_command ("SELECT id FROM uri WHERE uri = '" + uri + "'");
+			var datamodel = cnn.execute_select_command ("SELECT id FROM uris WHERE uri = '" + uri + "'");
 			var exists = (datamodel.get_n_rows() != 0);
 			cnn.close();
 			return exists;

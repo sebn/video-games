@@ -40,7 +40,7 @@ class BadnikApplication(Gtk.Application):
 		self.tosecdir = self.datadir + "/data/tosec"
 		self.srcdir = self.datadir + "/src"
 		
-		self.gamesdb = BadnikLibrary(self)
+		self.gamesdb = BadnikLibrary(self.savedatadir)
 		
 		self.focused_game = None
 		

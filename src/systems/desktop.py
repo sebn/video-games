@@ -23,6 +23,7 @@ from xdg import Exceptions
 from os import path
 from os import walk
 import sqlite3
+import urllib
 
 from gi.repository import Gtk
 from gi.repository import GamesManager
@@ -39,9 +40,12 @@ class Desktop(GamesManager.System):
 		GamesManager.System.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
 	def do_get_game_info(self, library, id):
+		print("Get info for game", id)
 		info = GamesManager.System._get_game_info(self, library, id)
 		
 		uri = library.get_game_uri(id)
+		uri = urllib.parse.urlparse(uri).path
+		
 		entry = DesktopEntry.DesktopEntry(uri)
 		
 		info.set_property("system", self.get_property("reference"))
@@ -65,18 +69,12 @@ class Desktop(GamesManager.System):
 			except:
 				return False
 		
+		uri = urllib.parse.urlparse(uri).path
 		return is_a_game_entry(uri)
 	
 	def do_get_game_reference_for_uri(self, uri):
+		uri = urllib.parse.urlparse(uri).path
 		return path.basename(uri).split(".")[0]
-	
-	def do_search_new_games(self, library):
-		print("desktop: do_search_new_games start")
-		for entry in self.get_game_desktop_entries():
-			self.add_new_game(entry)
-		
-		print("desktop: do_search_new_games end")
-		self.update_games_metadata(library)
 	
 	def update_games_metadata(self, library):
 		for id in self.get_games_id():
@@ -116,7 +114,8 @@ class Desktop(GamesManager.System):
 		db = sqlite3.connect(library.path)
 		exists = False
 		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			exists = path.exists(row[0])
+			game_path = urllib.parse.urlparse(row[0]).path
+			exists = path.exists(game_path)
 			break
 		db.close()
 		return exists
@@ -128,38 +127,7 @@ class Desktop(GamesManager.System):
 			value = DesktopEntry.DesktopEntry(row[0]).getExec()
 		db.close()
 		return value
-		
-	def get_game_desktop_entries(self):
-		'''Return the list of the paths of game related and not black listed desktop entries.'''
-		def get_application_directories():
-			"""Return the list of the application directories"""
-			app_dirs = []
-			
-			for dir in BaseDirectory.xdg_data_dirs:
-				app_dir = path.join(dir, "applications")
-				if path.exists(app_dir):
-					app_dirs.append(app_dir)
-			
-			return app_dirs
-		
-		def is_black_listed(file):
-			for name in Desktop.BLACK_LIST:
-				if file == name:
-					return True
-			return False
-		
-		game_entries = []
-		
-		for dir in get_application_directories():
-			for root, dirs, files in walk(dir):
-				for file in files:
-					if not is_black_listed(file):
-						file = path.join(root, file)
-						if self.is_a_game(file):
-							game_entries.append(file)
-		
-		return game_entries
-
+	
 if __name__ == '__main__':
 	desktop = Desktop()
 	for entry in desktop.get_game_desktop_entries():
