@@ -21,7 +21,6 @@ from xdg import BaseDirectory
 from xdg import DesktopEntry
 from xdg import Exceptions
 from os import path
-from os import walk
 import sqlite3
 import urllib
 
@@ -32,12 +31,18 @@ from systems.basesystem import BaseSystem
 from metadata import mobygames
 
 class Desktop(GamesManager.Desktop):
+	
 	BLACK_LIST = [ "steam.desktop",
 	               "lutris.desktop",
 	               "badnik.desktop" ]
 	
-	def __init__(self, library):
-		GamesManager.System.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
+	def __init__(self):
+		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
+	#	GamesManager.System.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
+	
+	###
+	### Abstract methods that have to be implemented.
+	###
 	
 	def do_get_game_info(self, library, id):
 		print("Get info for game", id)
@@ -53,7 +58,25 @@ class Desktop(GamesManager.Desktop):
 		info.set_property("icon", entry.getIcon())
 		return info
 	
-	def do_is_a_game(self, uri):
+	def do_get_game_exec(self, library, id):
+		db = sqlite3.connect(library.path)
+		value = None
+		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
+			value = DesktopEntry.DesktopEntry(row[0]).getExec()
+		db.close()
+		return value
+	
+	def do_query_is_game_available(self, library, id):
+		db = sqlite3.connect(library.path)
+		exists = False
+		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
+			game_path = urllib.parse.urlparse(row[0]).path
+			exists = path.exists(game_path)
+			break
+		db.close()
+		return exists
+	
+	def do_query_is_a_game(self, uri):
 		def is_a_game_category(category):
 			"""Return True if the given category can be considered as a game related category, False otherwise"""
 			return category == "Game"
@@ -76,17 +99,9 @@ class Desktop(GamesManager.Desktop):
 		uri = urllib.parse.urlparse(uri).path
 		return path.basename(uri).split(".")[0]
 	
-	def update_games_metadata(self, library):
-		for id in self.get_games_id():
-			self.download_metadata(library, id)
-	
-	def get_games_id(self):
-		db = sqlite3.connect(library.path)
-		ids = []
-		for row in db.execute('SELECT id FROM games WHERE systemid = ?', [self.get_property("id")]):
-			ids.append(row[0])
-		db.close()
-		return ids
+	###
+	### Utility methods.
+	###
 	
 	def download_metadata(self, library, id):
 		print("try to download metadata for", id)
@@ -109,26 +124,4 @@ class Desktop(GamesManager.Desktop):
 			print("got informations for", name, "on", system, "on Mobygames")
 			library.emit("game_updated", id)
 		db.close()
-	
-	def do_is_game_available(self, library, id):
-		db = sqlite3.connect(library.path)
-		exists = False
-		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			game_path = urllib.parse.urlparse(row[0]).path
-			exists = path.exists(game_path)
-			break
-		db.close()
-		return exists
-	
-	def do_get_game_exec(self, library, id):
-		db = sqlite3.connect(library.path)
-		value = None
-		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			value = DesktopEntry.DesktopEntry(row[0]).getExec()
-		db.close()
-		return value
-	
-if __name__ == '__main__':
-	desktop = Desktop()
-	for entry in desktop.get_game_desktop_entries():
-		print(entry)
+

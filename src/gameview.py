@@ -93,7 +93,7 @@ class MainGameView(Gtk.Box):
 		return False
 	
 	def add_game(self, id):
-		if (not self.has_game(id)) and self.app.gamesdb.is_game_available(id):
+		if (not self.has_game(id)) and self.app.gamesdb.query_is_game_available(id):
 			print("maingameview: adding game", id)
 			info = self.app.gamesdb.get_game_info(id)
 			if not info:

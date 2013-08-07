@@ -38,7 +38,7 @@ class BadnikLibrary(GamesManager.Library):
 		# Init the TOSEC databases
 		self.tosec = tosec.TOSEC(save_data_dir)
 		
-		self.add_system(desktop.Desktop(self))
+		self.add_system(desktop.Desktop())
 		#self.add_system(snes.SNES(self))
 		#self.add_system(megadrive.MegaDrive(self))
 
