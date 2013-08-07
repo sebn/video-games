@@ -31,7 +31,7 @@ from gi.repository import GamesManager
 from systems.basesystem import BaseSystem
 from metadata import mobygames
 
-class Desktop(GamesManager.System):
+class Desktop(GamesManager.Desktop):
 	BLACK_LIST = [ "steam.desktop",
 	               "lutris.desktop",
 	               "badnik.desktop" ]
