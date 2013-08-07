@@ -238,7 +238,7 @@ class GameView(Gtk.ScrolledWindow):
 		
 		self.secondary_info = Gtk.Grid ()
 		self.secondary_info.set_orientation(Gtk.Orientation.VERTICAL)
-		self.secondary_info.set_row_homogeneous(True)
+		self.secondary_info.set_row_homogeneous(False)
 		self.secondary_info.set_column_homogeneous(True)
 		self.secondary_info.set_halign(Gtk.Align.CENTER)
 		self.secondary_info.set_row_spacing(6)
@@ -312,9 +312,8 @@ class GameView(Gtk.ScrolledWindow):
 		self.secondary_info.attach_next_to(self.players, self._players, Gtk.PositionType.RIGHT, 1, 1)
 		self.secondary_info.attach_next_to(self.online, self._online, Gtk.PositionType.RIGHT, 1, 1)
 		self.secondary_info.show_all()
-		self.secondary_info.set_size_request(-1, -1)
 		
-		# Set the start button
+		# Set the screenshots
 		
 		self.screenshots_info = Gtk.Box()
 		self.screenshots_info.set_orientation(Gtk.Orientation.VERTICAL)
