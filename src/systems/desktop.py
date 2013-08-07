@@ -62,7 +62,8 @@ class Desktop(GamesManager.Desktop):
 		db = sqlite3.connect(library.path)
 		value = None
 		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			value = DesktopEntry.DesktopEntry(row[0]).getExec()
+			uri = urllib.parse.urlparse(row[0]).path
+			value = DesktopEntry.DesktopEntry(uri).getExec()
 		db.close()
 		return value
 	

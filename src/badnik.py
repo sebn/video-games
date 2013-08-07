@@ -191,15 +191,15 @@ class GameProcess(GObject.Object, Thread):
 		self.err = err
 	
 	def run(self):
-		if self.gamesdb.is_game_available(self.id):
+		if self.gamesdb.query_is_game_available(self.id):
 			args = shlex.split(self.gamesdb.get_game_exec(self.id))
-		
+			
 			self.emit('game_started', int(self.id))
-		
+			
 			start_time = time.time()
 			return_code = subprocess.call(args, stdout=self.out, stderr=self.err)
 			end_time = time.time()
-		
+			
 			self.emit('game_stopped', int(self.id), int(return_code), int(start_time), int(end_time))
 
 if __name__ == '__main__':
