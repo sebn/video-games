@@ -27,5 +27,17 @@ namespace GamesManager {
 			
 			return desktop_app_info.get_executable();
 		}
+		
+		public override bool
+		query_is_game_available (Library library, int game_id) {
+			var uri = library.get_game_uri(game_id);
+			var file = File.new_for_uri(uri);
+			if (file.query_exists()) {
+				foreach (string black_listed in library.get_application_black_list())
+					if (file.get_basename() == black_listed) return false;
+				return true;
+			}
+			else return false;
+		}
 	}
 }

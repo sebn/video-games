@@ -34,25 +34,6 @@ class Desktop(GamesManager.Desktop):
 	def __init__(self):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
-	def do_query_is_game_available(self, library, id):
-		exists = False
-		
-		# Check the file's existence
-		db = sqlite3.connect(library.path)
-		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			game_path = urllib.parse.urlparse(row[0]).path
-			exists = path.exists(game_path)
-			break
-		db.close()
-		
-		#
-		if exists:
-			for black_listed in library.get_application_black_list():
-				if path.basename(game_path) == black_listed:
-					return False
-		
-		return True
-	
 	def do_query_is_a_game(self, library, uri):
 		def is_a_game_category(category):
 			"""Return True if the given category can be considered as a game related category, False otherwise"""
