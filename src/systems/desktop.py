@@ -59,10 +59,6 @@ class Desktop(GamesManager.Desktop):
 		uri = urllib.parse.urlparse(uri).path
 		return is_a_game_entry(uri) and not is_black_listed(uri)
 	
-	def do_get_game_reference_for_uri(self, uri):
-		uri = urllib.parse.urlparse(uri).path
-		return path.basename(uri).split(".")[0]
-	
 	def do_download_game_metadata(self, library, game_id):
 		info = self.get_game_info(library, id)
 		

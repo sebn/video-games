@@ -49,5 +49,21 @@ namespace GamesManager {
 			}
 			else return false;
 		}
+		/*
+		public override bool
+		query_is_a_game (Library library, string uri) {
+			
+		}*/
+		
+		public override string
+		get_game_reference_for_uri (string uri) {
+			var file = File.new_for_uri(uri);
+			return file.get_basename().split(".")[0];
+		}
+		/*
+		public override GameInfo
+		download_game_metadata (Library library, int game_id) {
+			
+		}*/
 	}
 }
