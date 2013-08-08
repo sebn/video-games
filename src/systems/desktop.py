@@ -34,20 +34,6 @@ class Desktop(GamesManager.Desktop):
 	def __init__(self):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
-	def do_get_game_info(self, library, id):
-		print("Get info for game", id)
-		info = library.get_default_game_info(id)
-		
-		uri = library.get_game_uri(id)
-		uri = urllib.parse.urlparse(uri).path
-		
-		entry = DesktopEntry.DesktopEntry(uri)
-		
-		info.set_property("system", self.get_property("reference"))
-		info.set_property("title", entry.getName())
-		info.set_property("icon", entry.getIcon())
-		return info
-	
 	def do_get_game_exec(self, library, id):
 		db = sqlite3.connect(library.path)
 		value = None
