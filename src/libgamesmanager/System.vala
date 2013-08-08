@@ -13,7 +13,7 @@ namespace GamesManager {
 		/**
 		 * Return the balck list of applications.
 		 */
-		public abstract List<string> get_application_black_list ();
+		public abstract string[] get_application_black_list ();
 		
 		/**
 		 * Return a GameInfo object containing as much informations as possible about the game.

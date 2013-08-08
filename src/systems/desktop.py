@@ -85,7 +85,3 @@ class Desktop(GamesManager.Desktop):
 		
 		return info
 	
-	def do_get_application_black_list(self):
-		return [ "steam.desktop",
-	             "lutris.desktop",
-	             "badnik.desktop" ]

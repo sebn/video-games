@@ -1,7 +1,17 @@
 namespace GamesManager {
 	public abstract class Desktop : System {
+		private const string[] BLACK_LIST = {
+			"badnik.desktop",
+			"steam.desktop", 
+			"lutris.desktop" };
+		
 		public Desktop () {
 			//Object (reference: "desktop", game_search_type: GameSearchType.APPLICATIONS);
+		}
+		
+		public override string[]
+		get_application_black_list () {
+			return BLACK_LIST;
 		}
 		
 		public override GameInfo

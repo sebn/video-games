@@ -20,7 +20,7 @@
 from os import walk, path
 from systems.utils import has_suffix, get_path_from_uri
 
-from gi.repository import GamesManager
+from gi.repository import GamesManager, GLib
 
 from systems.tosecsystem import TOSECSystem
 import sqlite3
