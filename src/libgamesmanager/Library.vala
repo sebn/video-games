@@ -155,7 +155,7 @@ namespace GamesManager {
 			}
 		}
 		
-		private List<string>
+		public List<string>
 		get_application_black_list () {
 			var application_black_list = new List<string>();
 			
@@ -169,18 +169,12 @@ namespace GamesManager {
 		}
 		
 		private bool
-		query_is_file_black_listed (File file, List<string>? black_listed_filenames) {
+		query_is_file_black_listed (File file, List<string> black_listed_filenames) {
 			var file_name = file.get_basename();
 			
 			if (file_name != null) {
 				foreach (string black_listed in black_listed_filenames) {
-					if (black_listed == file_name) {
-						stdout.printf("BLACK LISTED !\n");
-						stdout.printf("file path   : %s\n", file.get_path());
-						stdout.printf("file name   : %s\n", file_name);
-						stdout.printf("balck listed: %s\n", black_listed);
-						return true;
-					}
+					if (black_listed == file_name) return true;
 				}
 			}
 			return false;
@@ -219,7 +213,7 @@ namespace GamesManager {
 				
 				foreach (File application_dir in application_dirs) {
 					if (application_dir.query_exists())
-						search_new_games_in_path(applications, application_dir, get_application_black_list());
+						search_new_games_in_path(applications, application_dir);
 				}
 			}
 			
@@ -231,8 +225,7 @@ namespace GamesManager {
 		}
 		
 		private void
-		search_new_games_in_path (List<System> systems, File file, List<string>? black_listed_filenames = null) {
-			if (!query_is_file_black_listed(file, black_listed_filenames)) {
+		search_new_games_in_path (List<System> systems, File file) {
 				foreach (System system in systems)
 					add_new_game (system, file.get_uri ());
 				
@@ -251,7 +244,6 @@ namespace GamesManager {
 						stderr.printf("Error: can't enumerate children of the file %s.\n", file.get_path());
 					}
 				}
-			}
 		}
 		
 		/*
@@ -370,7 +362,7 @@ namespace GamesManager {
 		
 		private void
 		add_new_game (System system, string uri) {
-			if (system.query_is_a_game(uri)) {
+			if (system.query_is_a_game(this, uri)) {
 				var reference = system.get_game_reference_for_uri(uri);
 				if (!query_game_exists_for_reference(system, reference)) {
 					var cnn = open_connection();

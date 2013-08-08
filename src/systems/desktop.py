@@ -62,16 +62,25 @@ class Desktop(GamesManager.Desktop):
 		return value
 	
 	def do_query_is_game_available(self, library, id):
-		db = sqlite3.connect(library.path)
 		exists = False
+		
+		# Check the file's existence
+		db = sqlite3.connect(library.path)
 		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
 			game_path = urllib.parse.urlparse(row[0]).path
 			exists = path.exists(game_path)
 			break
 		db.close()
-		return exists
+		
+		#
+		if exists:
+			for black_listed in library.get_application_black_list():
+				if path.basename(game_path) == black_listed:
+					return False
+		
+		return True
 	
-	def do_query_is_a_game(self, uri):
+	def do_query_is_a_game(self, library, uri):
 		def is_a_game_category(category):
 			"""Return True if the given category can be considered as a game related category, False otherwise"""
 			return category == "Game"
@@ -87,8 +96,14 @@ class Desktop(GamesManager.Desktop):
 			except:
 				return False
 		
+		def is_black_listed(file):
+			file_name = path.basename(file)
+			for black_listed in library.get_application_black_list():
+				if file_name == black_listed:
+					return False
+		
 		uri = urllib.parse.urlparse(uri).path
-		return is_a_game_entry(uri)
+		return is_a_game_entry(uri) and not is_black_listed(uri)
 	
 	def do_get_game_reference_for_uri(self, uri):
 		uri = urllib.parse.urlparse(uri).path

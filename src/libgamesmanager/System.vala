@@ -28,7 +28,7 @@ namespace GamesManager {
 		/**
 		 * Check if the given URI actually represents a game for this system.
 		 */
-		public abstract bool query_is_a_game (string uri);
+		public abstract bool query_is_a_game (Library library, string uri);
 		
 		/**
 		 * Return an unique reference for this game on this system.

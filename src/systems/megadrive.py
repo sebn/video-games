@@ -53,7 +53,7 @@ class MegaDrive(TOSECSystem):
 		db.close()
 		return exists
 	
-	def do_query_is_a_game(self, uri):
+	def do_query_is_a_game(self, library, uri):
 		game_path = get_path_from_uri(uri)
 		return has_suffix(game_path, "md")
 	
@@ -62,5 +62,6 @@ class MegaDrive(TOSECSystem):
 		return self.tosec.get_game_title(game_path)
 	
 	def do_get_application_black_list(self):
-		return [ "gens.desktop" ]
+		return [ "gens.desktop",
+		         "dribble-gens.desktop" ]
 

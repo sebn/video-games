@@ -11,7 +11,6 @@ Badnik 0.2
 	
 	Workflow and code:
 		Polish the "desktop" system:
-			Add a way to black list desktop entries
 		Add more comments to the Vala code
 		Add a way to stop a thread (the slow ones, searching for metadata)
 
