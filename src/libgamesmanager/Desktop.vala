@@ -18,5 +18,14 @@ namespace GamesManager {
 			
 			return info;
 		}
+		
+		public override string
+		get_game_exec (Library library, int game_id) {
+			var uri = library.get_game_uri(game_id);
+			var file = File.new_for_uri(uri);
+			var desktop_app_info = new DesktopAppInfo.from_filename(file.get_path());
+			
+			return desktop_app_info.get_executable();
+		}
 	}
 }

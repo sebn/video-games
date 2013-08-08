@@ -34,15 +34,6 @@ class Desktop(GamesManager.Desktop):
 	def __init__(self):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
-	def do_get_game_exec(self, library, id):
-		db = sqlite3.connect(library.path)
-		value = None
-		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			uri = urllib.parse.urlparse(row[0]).path
-			value = DesktopEntry.DesktopEntry(uri).getExec()
-		db.close()
-		return value
-	
 	def do_query_is_game_available(self, library, id):
 		exists = False
 		
