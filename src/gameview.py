@@ -83,7 +83,7 @@ class MainGameView(Gtk.Box):
 		self.set_view()
 		self.show_game_list()
 		
-		self.populate()
+		self.populate_async()
 	
 	def has_game(self, id):
 		# Beware of concurrent threads manipulating the same game simulteanously
@@ -94,15 +94,15 @@ class MainGameView(Gtk.Box):
 	
 	def add_game(self, id):
 		if (not self.has_game(id)) and self.app.gamesdb.query_is_game_available(id):
-			print("maingameview: adding game", id)
 			info = self.app.gamesdb.get_game_info(id)
 			if not info:
 				info = GamesManager.GameInfo()
 			title = info.get_property("title")
 			developer = info.get_property("developer")
 			icon = info.get_pixbuf(128, 0)
-			
+			Gdk.threads_enter()
 			self.view.get_model().append([str(id), "", title, developer, icon, int(time.time()), False])
+			Gdk.threads_leave()
 	
 	def set_view(self, settings=None, setting=None):
 		value = self.app.settings.get_value('view-as').get_string()
@@ -116,6 +116,9 @@ class MainGameView(Gtk.Box):
 		for id in self.app.gamesdb.get_games_id():
 			self.add_game(id)
 	
+	def populate_async(self):
+		Thread(target=self.populate, args=(), kwargs={}).start()
+	
 	def on_item_activated(self, view, itemid, itemindex):
 		self.show_game(itemid)
 	
@@ -123,14 +126,12 @@ class MainGameView(Gtk.Box):
 		self.show_game_list()
 	
 	def on_add_games_button_clicked(self, button):
-		print("add games button clicked")
 		self.show_game_list()
 	
 	def on_play_game_button_clicked(self, button):
 		self.app.play_game()
 	
 	def on_game_updated(self, application, id):
-		print("maingameview: on game updated", id)
 		
 		# Get the relative entry in the model
 		iter = None
@@ -144,18 +145,16 @@ class MainGameView(Gtk.Box):
 		# thread with any thread calling it.
 		# Every signal handling function (or method) should use them.
 		
-		Gdk.threads_enter()
 		if iter:
-			print('maingameview: on game updated: update entry')
 			info = self.app.gamesdb.get_game_info(id)
+			Gdk.threads_enter()
 			self.model.set_value(iter, 2, info.get_property("title"))
 			self.model.set_value(iter, 3, info.get_property("developer"))
 			#self.model.set_value(iter, 4, info.get_pixbuf(128, 0))
 			self.model.set_value(iter, 5, int(time.time()))
+			Gdk.threads_leave()
 		else:
-			print('maingameview: on game updated: add entry')
 			self.add_game(id)
-		Gdk.threads_leave()
 	
 	def show_game_list(self):
 		self.app.focus_game(None)
@@ -396,7 +395,6 @@ class GameView(Gtk.ScrolledWindow):
 		self._set_informations_from_game()
 	
 	def on_game_updated(self, application, id):
-		print("gameview: on game updated", id)
 		if self.app.focused_game and int(self.app.focused_game) == int(id):
 			self._set_informations_from_game()
 	

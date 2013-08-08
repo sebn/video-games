@@ -20,12 +20,13 @@ GI_TYPELIB    = $(GIR_NAME)-$(GIR_VERSION).typelib
 VALAC_OUTPUT = $(SHARED_OBJECT) $(GI_REPOSITORY) $(GIR_NAME).vapi
 VALA_PKG = --pkg=gtk+-3.0 --pkg=gdk-pixbuf-2.0 --pkg=libgda-5.0 --pkg=libxml-2.0
 VALA_C_OPTION = -X -fPIC -X -shared
+VALA_OPTIONS = --thread
 VAPI_DIR = --vapidir=.
 
 all: $(VALAC_OUTPUT) $(GI_TYPELIB)
 
 $(VALAC_OUTPUT): $(SOURCES)
-	valac $^ $(VALA_PKG) $(VAPI_DIR) $(VALA_C_OPTION) -o $(SHARED_OBJECT) --library=$(GIR_NAME) --gir $(GI_REPOSITORY)
+	valac $^ $(VALA_PKG) $(VAPI_DIR) $(VALA_OPTIONS) $(VALA_C_OPTION) -o $(SHARED_OBJECT) --library=$(GIR_NAME) --gir $(GI_REPOSITORY)
 
 $(GI_TYPELIB): $(GI_REPOSITORY)
 	g-ir-compiler --shared-library=$(SHARED_OBJECT) --output=$@ $(GI_REPOSITORY)

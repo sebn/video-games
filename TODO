@@ -10,9 +10,12 @@ Badnik 0.2
 			display a correct system name
 	
 	Workflow and code:
-		Polish the "desktop" system:
+		Polish the systems:
+			improve metadata downloading
 		Add more comments to the Vala code
-		Add a way to stop a thread (the slow ones, searching for metadata)
+		Add a way to stop slow functions:
+			searching in the file system
+			searching for metadata
 
 Badnik 0.3
 	GUI:
@@ -25,7 +28,6 @@ Badnik 0.3
 	Workflow and code:
 		Add a man page
 		Log the game output
-		Prevent multiple instances of a game to be run
 		Add some basic command line options (help, verbose...)
 		Add internationalization
 		Solve the warnings raised by Gda.Connection.open_from_string

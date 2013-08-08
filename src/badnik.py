@@ -25,8 +25,11 @@ from xdg import BaseDirectory
 from badnikwindow import BadnikWindow
 from badniklibrary import BadnikLibrary
 
+import time
+
 class BadnikApplication(Gtk.Application):
 	def __init__(self):
+		print (time.time()-start_time, "start init application")
 		Gtk.Application.__init__(self, application_id = 'org.gnome.badnik', flags = Gio.ApplicationFlags.FLAGS_NONE)
 		GLib.threads_init()
 		Gdk.threads_init()
@@ -70,13 +73,21 @@ class BadnikApplication(Gtk.Application):
 		settings = Gtk.Settings.get_default()
 		settings.set_property("gtk-application-prefer-dark-theme", True)
 		settings.set_property("gtk-shell-shows-app-menu", True)
+		print (time.time()-start_time, "end init application")
+		
+		self.running_games = {}
 	
 	def on_activate(self, data=None):
+		print (time.time()-start_time, "start activating application")
+		print("start window")
 		self.window = BadnikWindow(self)
+		print("stop  window")
+		self.window.connect("destroy", self.on_quit, None)
 		self.window.show()
 		self.add_window(self.window)
 		
 		self.update_library_async()
+		print (time.time()-start_time, "end activating application")
 	
 	def _add_actions(self):
 		for action_entry in self._action_entries:
@@ -101,6 +112,9 @@ class BadnikApplication(Gtk.Application):
 			self.add_action(action)
 	
 	def on_quit(self, action, data):
+		print("Quitting Badnik")
+		self.window.hide()
+		self.gamesdb.set_property("stop_searches", True)
 		self.quit()
 	
 	def on_about(self, action, data):
@@ -151,7 +165,9 @@ class BadnikApplication(Gtk.Application):
 		
 	def play_game(self, id=None):
 		id = id if id else self.focused_game
-		if id:
+		
+		if id and (not (id in self.running_games) or self.running_games[id] == False):
+			self.running_games[id] = True
 			p = GameProcess(self.gamesdb, id)
 			p.connect('game_started', self.on_game_started)
 			p.connect('game_stopped', self.on_game_stopped)
@@ -164,6 +180,7 @@ class BadnikApplication(Gtk.Application):
 		pass
 	
 	def on_game_stopped(self, process, id, return_code, start_time, end_time):
+		self.running_games[id] = False
 		time_played = end_time - start_time
 		
 		if return_code == 0 or time_played > 10:
@@ -203,6 +220,7 @@ class GameProcess(GObject.Object, Thread):
 			self.emit('game_stopped', int(self.id), int(return_code), int(start_time), int(end_time))
 
 if __name__ == '__main__':
+	start_time = time.time()
 	app = BadnikApplication()
 	exit_status = app.run(sys.argv)
 	sys.exit(exit_status)

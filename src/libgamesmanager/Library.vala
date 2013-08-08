@@ -4,6 +4,8 @@ namespace GamesManager {
 		public string db_name { construct; get; }
 		public string db_dir { construct; get; }
 		
+		public bool stop_searches { set; get; default = false; }
+		
 		private const string systems_table = "
 		CREATE TABLE IF NOT EXISTS systems (
 			id INTEGER PRIMARY KEY,
@@ -54,6 +56,10 @@ namespace GamesManager {
 		public
 		Library (string db_name, string db_dir) {
 			Object (db_name: db_name, db_dir: db_dir);
+		}
+		
+		~Library () {
+			stop_searches = true;
 		}
 		
 		construct {
@@ -202,7 +208,7 @@ namespace GamesManager {
 				}
 			}
 			
-			if (applications.length() > 0) {
+			if (applications.length() > 0 && ! stop_searches) {
 				var application_dirs = new List<File>();
 				
 				application_dirs.append (File.new_for_path(Environment.get_user_data_dir()).get_child("applications"));
@@ -217,7 +223,7 @@ namespace GamesManager {
 				}
 			}
 			
-			if (standard.length() > 0) {
+			if (standard.length() > 0 && ! stop_searches) {
 				var file = File.new_for_path(path);
 				if (file.query_exists())
 					search_new_games_in_path(standard, file);
@@ -236,7 +242,7 @@ namespace GamesManager {
 						var enumerator = file.enumerate_children (FileAttribute.STANDARD_NAME, 0);
 						
 						FileInfo file_info;
-						while ((file_info = enumerator.next_file ()) != null) {
+						while ((file_info = enumerator.next_file ()) != null && ! stop_searches) {
 							search_new_games_in_path (systems, file.get_child (file_info.get_name ()));
 						}
 					}
@@ -448,10 +454,10 @@ namespace GamesManager {
 			var cnn = open_connection();
 			try {
 				stdout.printf("Add uri %s to game %i to the DB\n", uri, game_id);
-				cnn.execute_non_select_command (@"'INSERT INTO uris (id, uri, gameid) VALUES (NULL, \"$(uri)\", $(game_id.to_string("%i")))");
+				cnn.execute_non_select_command (@"INSERT INTO uris (id, uri, gameid) VALUES (NULL, \"$(uri)\", $(game_id.to_string("%i")))");
 			}
 			catch (Error e) {
-				stderr.printf("Error: can't add URI %s to thegame identifiers %i.\n", uri, game_id);
+				stderr.printf("Error: can't add URI %s to game %i.\n", uri, game_id);
 			}
 			cnn.close();
 		}
