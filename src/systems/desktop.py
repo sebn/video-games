@@ -31,11 +31,6 @@ from systems.basesystem import BaseSystem
 from metadata import mobygames
 
 class Desktop(GamesManager.Desktop):
-	
-	BLACK_LIST = [ "steam.desktop",
-	               "lutris.desktop",
-	               "badnik.desktop" ]
-	
 	def __init__(self):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
@@ -45,7 +40,7 @@ class Desktop(GamesManager.Desktop):
 	
 	def do_get_game_info(self, library, id):
 		print("Get info for game", id)
-		info = GamesManager.System._get_game_info(self, library, id)
+		info = library.get_default_game_info(id)
 		
 		uri = library.get_game_uri(id)
 		uri = urllib.parse.urlparse(uri).path
@@ -124,4 +119,8 @@ class Desktop(GamesManager.Desktop):
 			print("got informations for", name, "on", system, "on Mobygames")
 			library.emit("game_updated", id)
 		db.close()
-
+	
+	def do_get_application_black_list(self):
+		return [ "steam.desktop",
+	             "lutris.desktop",
+	             "badnik.desktop" ]

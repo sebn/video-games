@@ -30,7 +30,7 @@ class MegaDrive(TOSECSystem):
 		TOSECSystem.__init__(self, gamesdb, "megadrive")
 	
 	def do_get_game_info(self, library, id):
-		info = GamesManager.System._get_game_info(self, library, id)
+		info = library.get_default_game_info(id)
 		
 		game_path = get_path_from_uri(library.get_game_uri(id))
 		
@@ -60,4 +60,7 @@ class MegaDrive(TOSECSystem):
 	def do_get_game_reference_for_uri(self, uri):
 		game_path = get_path_from_uri(uri)
 		return self.tosec.get_game_title(game_path)
+	
+	def do_get_application_black_list(self):
+		return [ "gens.desktop" ]
 
