@@ -29,10 +29,10 @@ from systems import snes
 
 class BadnikLibrary(GamesManager.Library):
 	'''A games dedicated database'''
-	def __init__(self, save_data_dir):
+	def __init__(self, app, save_data_dir):
 		GamesManager.Library.__init__(self, db_name = "games", db_dir = save_data_dir)
 		
-		#self.app = app
+		self.app = app
 		self.path = os.path.join(save_data_dir, "games.db")
 		
 		# Init the TOSEC databases
@@ -40,5 +40,5 @@ class BadnikLibrary(GamesManager.Library):
 		
 		self.add_system(desktop.Desktop())
 		#self.add_system(snes.SNES(self))
-		#self.add_system(megadrive.MegaDrive(self))
+		self.add_system(megadrive.MegaDrive(self))
 

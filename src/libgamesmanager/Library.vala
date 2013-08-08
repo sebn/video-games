@@ -298,6 +298,7 @@ namespace GamesManager {
 		private void
 		add_new_game (System system, string uri) {
 			if (system.query_is_a_game(uri)) {
+				stdout.printf("%s\n", uri);
 				var reference = system.get_game_reference_for_uri(uri);
 				if (!query_game_exists_for_reference(system, reference)) {
 					var cnn = open_connection();

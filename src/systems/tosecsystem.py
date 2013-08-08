@@ -24,6 +24,7 @@ class TOSECSystem(GamesManager.System):
 		GamesManager.System.__init__(self, reference = system)
 		tosecdata = gamesdb.app.tosecdir + "/" + self.get_property("reference") + ".dat"
 		gamesdb.tosec.parse_file(tosecdata, self.get_property("reference"))
+		self.tosec = gamesdb.tosec
 	
 	def get_game_name(self, id):
 		path = None

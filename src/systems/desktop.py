@@ -38,7 +38,6 @@ class Desktop(GamesManager.Desktop):
 	
 	def __init__(self):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
-	#	GamesManager.System.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
 	###
 	### Abstract methods that have to be implemented.

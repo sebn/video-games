@@ -5,11 +5,14 @@ Badnik 0.2
 				search for new games
 				if a game isn't available anymore, remove it from the GUI
 			Don't duplicate games (done except for concurrent access)
-		Clean up the single game view
+		Clean up the single game view:
+			display screenshots
+			display a correct system name
 	
 	Workflow and code:
-		Polish the "desktop" system
-		Add more comments
+		Polish the "desktop" system:
+			Add a way to black list desktop entries
+		Add more comments to the Vala code
 		Add a way to stop a thread (the slow ones, searching for metadata)
 
 Badnik 0.3

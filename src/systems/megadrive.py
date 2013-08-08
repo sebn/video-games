@@ -18,7 +18,7 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 from os import walk, path
-from systems.utils import has_suffix
+from systems.utils import has_suffix, get_path_from_uri
 
 from gi.repository import GamesManager
 
@@ -30,46 +30,34 @@ class MegaDrive(TOSECSystem):
 		TOSECSystem.__init__(self, gamesdb, "megadrive")
 	
 	def do_get_game_info(self, library, id):
-		info = GamesManager.System._get_game_info(self, id)
+		info = GamesManager.System._get_game_info(self, library, id)
 		
-		uri = self.get_game_uri(id)
+		game_path = get_path_from_uri(library.get_game_uri(id))
 		
-		info.set_property("title", library.tosec.get_game_title(uri))
+		info.set_property("title", self.tosec.get_game_title(game_path))
 		info.set_property("cover", library.app.iconsdir + "/" + self.get_property("reference") + ".png")
 		
 		return info
 	
-	def do_get_game_reference_for_uri(self, library, uri):
-		return library.tosec.get_game_title(uri)
+	def do_get_game_exec(self, library, id):
+		game_path = get_path_from_uri(library.get_game_uri(id))
+		return 'gens --fs --render-mode 2 --quickexit --enable-perfectsynchro "' + game_path + '"'
 	
-	def do_search_new_games(self):
-		print("update megadrive start")
-		for rom in self.get_roms():
-			self.add_new_game(rom)
-		
-		print("update megadrive end")
-		#self.update_games_metadata()
-	
-	def get_roms(self):
-		roms = []
-		for root, dirs, files in walk(path.expanduser("~")):
-			for file in files:
-				file = path.join(root, file)
-				if self.is_a_game(file):
-					roms.append(file)
-		return roms
-	
-	def do_is_a_game(self, uri):
-		return has_suffix(uri, "md")
-	
-	def do_is_game_available(self, library, id):
+	def do_query_is_game_available(self, library, id):
 		db = sqlite3.connect(library.path)
 		exists = False
 		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			exists = path.exists(row[0])
+			game_path = get_path_from_uri(row[0])
+			exists = path.exists(game_path)
 			break
 		db.close()
 		return exists
 	
-	def do_get_game_exec(self, library, id):
-		return 'gens --game "' + self.get_game_uri(id) + '"'
+	def do_query_is_a_game(self, uri):
+		game_path = get_path_from_uri(uri)
+		return has_suffix(game_path, "md")
+	
+	def do_get_game_reference_for_uri(self, uri):
+		game_path = get_path_from_uri(uri)
+		return self.tosec.get_game_title(game_path)
+

@@ -40,7 +40,7 @@ class BadnikApplication(Gtk.Application):
 		self.tosecdir = self.datadir + "/data/tosec"
 		self.srcdir = self.datadir + "/src"
 		
-		self.gamesdb = BadnikLibrary(self.savedatadir)
+		self.gamesdb = BadnikLibrary(self, self.savedatadir)
 		
 		self.focused_game = None
 		
@@ -144,7 +144,7 @@ class BadnikApplication(Gtk.Application):
 		self.settings.connect('changed::view-as', _changed_view_as)
 	
 	def update_library(self):
-		self.gamesdb.search_new_games("/")
+		self.gamesdb.search_new_games(os.path.expanduser("~"))
 	
 	def update_library_async(self):
 		Thread(target=self.update_library, args=(), kwargs={}).start()

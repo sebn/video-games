@@ -18,6 +18,7 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 import re
+import urllib
 
 def has_suffix(string, suffix):
 	result = re.match('(.*)\.' + suffix + '$', string)
@@ -25,3 +26,6 @@ def has_suffix(string, suffix):
 		return True
 	else:
 		return False
+
+def get_path_from_uri(uri):
+	return urllib.parse.unquote(urllib.parse.urlparse(uri).path)
