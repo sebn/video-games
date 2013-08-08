@@ -64,4 +64,7 @@ class MegaDrive(TOSECSystem):
 	def do_get_application_black_list(self):
 		return [ "gens.desktop",
 		         "dribble-gens.desktop" ]
-
+	
+	def do_download_game_metadata(self, library, game_id):
+		return self.get_game_info(library, id)
+	

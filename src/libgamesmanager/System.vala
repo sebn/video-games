@@ -11,6 +11,11 @@ namespace GamesManager {
 		public string reference { construct; get; }
 		
 		/**
+		 * Return the balck list of applications.
+		 */
+		public abstract List<string> get_application_black_list ();
+		
+		/**
 		 * Return a GameInfo object containing as much informations as possible about the game.
 		 */
 		public abstract GameInfo get_game_info (Library library, int game_id);
@@ -36,8 +41,8 @@ namespace GamesManager {
 		public abstract string get_game_reference_for_uri (string uri);
 		
 		/**
-		 * Return the balck list of applications.
+		 * Return an unique reference for this game on this system.
 		 */
-		public abstract List<string> get_application_black_list ();
+		public abstract GameInfo download_game_metadata (Library library, int game_id);
 	}
 }

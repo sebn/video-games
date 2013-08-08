@@ -34,10 +34,6 @@ class Desktop(GamesManager.Desktop):
 	def __init__(self):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
 	
-	###
-	### Abstract methods that have to be implemented.
-	###
-	
 	def do_get_game_info(self, library, id):
 		print("Get info for game", id)
 		info = library.get_default_game_info(id)
@@ -109,31 +105,27 @@ class Desktop(GamesManager.Desktop):
 		uri = urllib.parse.urlparse(uri).path
 		return path.basename(uri).split(".")[0]
 	
-	###
-	### Utility methods.
-	###
-	
-	def download_metadata(self, library, id):
-		print("try to download metadata for", id)
-		info = self.do_get_game_info(id)
-		if not info:
-			return
+	def do_download_game_metadata(self, library, game_id):
+		info = self.get_game_info(library, id)
+		
 		name, system = info.get_property("title"), info.get_property("system")
 		if not (name and system):
-			return
-		print("downloading metadata for", id)
-		print("searching for", name, "on", system, "on Mobygames")
+			return info
+		
+		# Searching the game on Mobygames
 		urls = mobygames.get_search_results(name, system)
-		db = sqlite3.connect(library.path)
-		print("found results for", name, "on", system, "on Mobygames")
+		
+		# Getting information from the game's page on Mobygames
 		if len(urls) > 0:
 			print("getting informations for", name, "on", system, "on Mobygames")
-			info = mobygames.get_game_info(urls[0])
-			db.execute('UPDATE games SET developer = ?,released = ?, genre = ?, description = ?, rank = ? WHERE id = ?', [info['developer'], info['released'], info['genre'], info['description'], info['rank'], id])
-			db.commit()
-			print("got informations for", name, "on", system, "on Mobygames")
-			library.emit("game_updated", id)
-		db.close()
+			dl_info = mobygames.get_game_info(urls[0])
+			info.set_property("developer", dl_info["developer"])
+			info.set_property("released", dl_info["released"])
+			info.set_property("genre", dl_info["genre"])
+			info.set_property("description", dl_info["description"])
+			info.set_property("rank", dl_info["rank"])
+		
+		return info
 	
 	def do_get_application_black_list(self):
 		return [ "steam.desktop",

@@ -475,5 +475,16 @@ namespace GamesManager {
 				return false;
 			}
 		}
+		
+		public void
+		download_game_metadata (int game_id) throws Error {
+			var system_ref = get_system_reference(game_id);
+			var system = systems.get(system_ref);
+			var metadata = system.download_game_metadata(this, game_id);
+			var cnn = open_connection();
+			cnn.execute_non_select_command (@"UPDATE games SET developer = \"$(metadata.developer)\",released = $(metadata.released), genre = \"$(metadata.genre)\", description = \"$(metadata.description)\", rank = $(metadata.rank) WHERE id = $(game_id)");
+			cnn.close();
+			game_updated(game_id);
+		}
 	}
 }
