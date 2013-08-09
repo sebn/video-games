@@ -25,9 +25,12 @@ from gi.repository import GamesManager, GLib
 from systems.tosecsystem import TOSECSystem
 import sqlite3
 
-class MegaDrive(TOSECSystem):
+class MegaDrive(GamesManager.MegaDrive):
 	def __init__(self, gamesdb):
-		TOSECSystem.__init__(self, gamesdb, "megadrive")
+		GamesManager.MegaDrive.__init__(self, reference = "megadrive")
+		tosecdata = gamesdb.app.tosecdir + "/" + self.get_property("reference") + ".dat"
+		gamesdb.tosec.parse_file(tosecdata, self.get_property("reference"))
+		self.tosec = gamesdb.tosec
 	
 	def do_get_game_info(self, library, id):
 		info = library.get_default_game_info(id)
@@ -43,28 +46,24 @@ class MegaDrive(TOSECSystem):
 		game_path = get_path_from_uri(library.get_game_uri(id))
 		return 'gens --fs --render-mode 2 --quickexit --enable-perfectsynchro "' + game_path + '"'
 	
-	def do_query_is_game_available(self, library, id):
-		db = sqlite3.connect(library.path)
-		exists = False
-		for row in db.execute('SELECT uri FROM uris WHERE gameid = ?', [id]):
-			game_path = get_path_from_uri(row[0])
-			exists = path.exists(game_path)
-			break
-		db.close()
-		return exists
-	
-	def do_query_is_a_game(self, library, uri):
-		game_path = get_path_from_uri(uri)
-		return has_suffix(game_path, "md")
-	
 	def do_get_game_reference_for_uri(self, uri):
 		game_path = get_path_from_uri(uri)
 		return self.tosec.get_game_title(game_path)
 	
-	def do_get_application_black_list(self):
-		return [ "gens.desktop",
-		         "dribble-gens.desktop" ]
-	
 	def do_download_game_metadata(self, library, game_id):
 		return self.get_game_info(library, id)
+	
+	def get_game_name(self, id):
+		return "lol"
+		path = None
+		for row in self.get_property("library").db.execute('SELECT path FROM ' + self.get_property("reference") + ' WHERE id = ?', [id]):
+			path = row[0]
+		
+		if path:
+			return self.get_property("library").tosec.get_game_title(path)
+		else:
+			return id
+	
+	def get_game_icon(self, id, size, flag):
+		return self.get_property("library").app.iconsdir + "/" + self.get_property("reference") + ".png"
 	

@@ -11,7 +11,8 @@ GIR_VERSION = 0.1
 SOURCES = GameInfo.vala \
           Library.vala \
           System.vala \
-          Desktop.vala
+          Desktop.vala \
+          MegaDrive.vala
 
 SHARED_OBJECT = $(LIB_NAME).so
 GI_REPOSITORY = $(GIR_NAME)-$(GIR_VERSION).gir

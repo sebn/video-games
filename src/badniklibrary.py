@@ -40,5 +40,5 @@ class BadnikLibrary(GamesManager.Library):
 		
 		self.add_system(desktop.Desktop())
 		#self.add_system(snes.SNES(self))
-		#self.add_system(megadrive.MegaDrive(self))
+		self.add_system(megadrive.MegaDrive(self))
 
