@@ -8,7 +8,7 @@ namespace GamesManager {
 	public abstract class System : Object {
 		public GameSearchType game_search_type { construct set; get; default = GameSearchType.STANDARD; }
 		public int64 id { set; get; }
-		public string reference { construct; get; }
+		public string reference { construct set; get; }
 		
 		/**
 		 * Return the balck list of applications.

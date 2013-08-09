@@ -12,7 +12,8 @@ SOURCES = GameInfo.vala \
           Library.vala \
           System.vala \
           Desktop.vala \
-          MegaDrive.vala
+          MegaDrive.vala \
+          Doom.vala
 
 SHARED_OBJECT = $(LIB_NAME).so
 GI_REPOSITORY = $(GIR_NAME)-$(GIR_VERSION).gir

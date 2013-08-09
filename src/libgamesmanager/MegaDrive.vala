@@ -19,59 +19,64 @@ namespace GamesManager {
 		public MegaDriveROMHeader (string path) throws Error {
 			var file = File.new_for_path(path);
 			var file_stream = file.read ();
-		    var data_stream = new DataInputStream (file_stream);
-		    data_stream.set_byte_order (DataStreamByteOrder.BIG_ENDIAN);
-		    
-		    data_stream.seek(0x100, SeekType.SET);
-		    
-		    var buffer = new uint8[16];
-		    
-		    data_stream.read (buffer);
-		    console_name = (string) buffer;
-		    
-		    data_stream.read (buffer);
-		    release_date = (string) buffer;
-		    
-		    buffer = new uint8[48];
-		    
-		    data_stream.read (buffer);
-		    domestic_name = (string) buffer;
-		    
-		    data_stream.read (buffer);
-		    international_name = (string) buffer;
-		    
-		    buffer = new uint8[14];
-		    
-		    data_stream.read (buffer);
-		    version = (string) buffer;
-		    
-		    checksum = data_stream.read_uint16 ();
-		    
-		    buffer = new uint8[16];
-		    
-		    data_stream.read (buffer);
-		    IO_support = (string) buffer;
-		    
-		    ROM_start = data_stream.read_uint32 ();
-		    ROM_end = data_stream.read_uint32 ();
-		    
-		    RAM_start = data_stream.read_uint32 ();
-		    RAM_end = data_stream.read_uint32 ();
-		    
-		    buffer = new uint8[3];
-		    
-		    data_stream.read (buffer);
-		    enables_SRAM = (string) buffer;
-		    
-		    data_stream.skip (1);
-		    
-		    SRAM_start = data_stream.read_uint32 ();
-		    SRAM_end = data_stream.read_uint32 ();
-		    
-		    buffer = new uint8[68];
-		    
-		    data_stream.read (buffer);
-		    notes = (string) buffer;
+			var data_stream = new DataInputStream (file_stream);
+			data_stream.set_byte_order (DataStreamByteOrder.BIG_ENDIAN);
+			
+			data_stream.seek(0x100, SeekType.SET);
+			
+			var buffer = new uint8[16];
+			
+			data_stream.read (buffer);
+			console_name = (string) buffer;
+			
+			data_stream.read (buffer);
+			release_date = (string) buffer;
+			
+			buffer = new uint8[48];
+			
+			data_stream.read (buffer);
+			domestic_name = (string) buffer;
+			
+			data_stream.read (buffer);
+			international_name = (string) buffer;
+			
+			buffer = new uint8[14];
+			
+			data_stream.read (buffer);
+			version = (string) buffer;
+			
+			checksum = data_stream.read_uint16 ();
+			
+			buffer = new uint8[16];
+			
+			data_stream.read (buffer);
+			IO_support = (string) buffer;
+			
+			ROM_start = data_stream.read_uint32 ();
+			ROM_end = data_stream.read_uint32 ();
+			
+			RAM_start = data_stream.read_uint32 ();
+			RAM_end = data_stream.read_uint32 ();
+			
+			buffer = new uint8[3];
+			
+			data_stream.read (buffer);
+			enables_SRAM = (string) buffer;
+			
+			data_stream.skip (1);
+			
+			SRAM_start = data_stream.read_uint32 ();
+			SRAM_end = data_stream.read_uint32 ();
+			
+			buffer = new uint8[68];
+			
+			data_stream.read (buffer);
+			notes = (string) buffer;
+		}
+		
+		public bool
+		query_is_valid () {
+			return console_name == "SEGA GENESIS    " || console_name == "SEGA MEGA DRIVE ";
 		}
 	}
 	
@@ -81,7 +86,7 @@ namespace GamesManager {
 			"dribble-gens.desktop" };
 		
 		public MegaDrive () {
-			//Object (reference: "megadrive", game_search_type: GameSearchType.APPLICATIONS);
+			Object (reference: "megadrive", game_search_type: GameSearchType.STANDARD);
 		}
 		
 		public override string[]
@@ -110,13 +115,13 @@ namespace GamesManager {
 		query_is_a_game (Library library, string uri) {
 			var file = File.new_for_uri (uri);
 			var splitted_name = file.get_basename().split(".");
-			var extension = splitted_name[splitted_name.length - 1];
+			var extension = splitted_name[splitted_name.length - 1].down();
 			
 			if (extension != "bin" && extension != "md") return false;
 			
 			try {
 				var header = new MegaDriveROMHeader (file.get_path ());
-				return header.console_name == "SEGA GENESIS    " || header.console_name == "SEGA MEGA DRIVE ";
+				return header.query_is_valid ();
 			}
 			catch (Error e) {
 				return false;
