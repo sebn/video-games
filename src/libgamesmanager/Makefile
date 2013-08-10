@@ -25,6 +25,13 @@ VALA_C_OPTION = -X -fPIC -X -shared
 VALA_OPTIONS = --thread
 VAPI_DIR = --vapidir=.
 
+ICON_THEME = hicolor
+
+DEVICES_ICONS = game-system-megadrive-jp.png \
+                game-system-superfamicom.png
+
+INSTALLED_DEVICE_ICONS = $(DEVICES_ICONS:%=$(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%)
+
 all: $(VALAC_OUTPUT) $(GI_TYPELIB)
 
 $(VALAC_OUTPUT): $(SOURCES)
@@ -33,10 +40,14 @@ $(VALAC_OUTPUT): $(SOURCES)
 $(GI_TYPELIB): $(GI_REPOSITORY)
 	g-ir-compiler --shared-library=$(SHARED_OBJECT) --output=$@ $(GI_REPOSITORY)
 
-install: all
+install: all $(INSTALLED_DEVICE_ICONS)
 	install -D $(SHARED_OBJECT) $(libdir)/$(PKG_NAME)/$(SHARED_OBJECT)
 	install -D $(GI_TYPELIB) $(libdir)/$(PKG_NAME)/girepository-1.0/$(GIR_NAME)-$(GIR_VERSION).typelib
+
+$(INSTALLED_DEVICE_ICONS): $(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%: data/icons/%
+	install -D $< $@
 	
+
 clean:
 	rm -f $(VALAC_OUTPUT) $(GI_TYPELIB)
 

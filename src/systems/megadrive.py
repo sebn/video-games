@@ -53,17 +53,3 @@ class MegaDrive(GamesManager.MegaDrive):
 	def do_download_game_metadata(self, library, game_id):
 		return self.get_game_info(library, id)
 	
-	def get_game_name(self, id):
-		return "lol"
-		path = None
-		for row in self.get_property("library").db.execute('SELECT path FROM ' + self.get_property("reference") + ' WHERE id = ?', [id]):
-			path = row[0]
-		
-		if path:
-			return self.get_property("library").tosec.get_game_title(path)
-		else:
-			return id
-	
-	def get_game_icon(self, id, size, flag):
-		return self.get_property("library").app.iconsdir + "/" + self.get_property("reference") + ".png"
-	
