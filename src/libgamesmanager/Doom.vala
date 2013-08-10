@@ -46,7 +46,8 @@ namespace GamesManager {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			
-			info.title = @"DOOM Engine game $(file.get_basename())";
+			info.title = file.get_basename();
+			info.icon = "gtk-floppy";
 			
 			return info;
 		}

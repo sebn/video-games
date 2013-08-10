@@ -38,7 +38,7 @@ class MegaDrive(GamesManager.MegaDrive):
 		game_path = get_path_from_uri(library.get_game_uri(id))
 		
 		info.set_property("title", self.tosec.get_game_title(game_path))
-		info.set_property("cover", library.app.iconsdir + "/" + self.get_property("reference") + ".png")
+		info.set_property("icon", "game-system-megadrive-jp.png")
 		
 		return info
 	

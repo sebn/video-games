@@ -8,8 +8,9 @@ LIB_NAME = libgamesmanager
 GIR_NAME = GamesManager
 GIR_VERSION = 0.1
 
-SOURCES = GameInfo.vala \
-          Library.vala \
+SOURCES = Library.vala \
+          GameInfo.vala \
+          Glrmame.vala \
           System.vala \
           Desktop.vala \
           MegaDrive.vala \

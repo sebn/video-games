@@ -51,8 +51,8 @@ TOSEC = \
 	data/tosec/snes.dat
 
 SYSTEMICONS = \
-	data/icons/megadrive.png \
-	data/icons/snes.png
+#	data/icons/megadrive.png \
+#	data/icons/snes.png
 
 SRCDIR = $(DATADIR)/src
 
