@@ -26,6 +26,7 @@ from metadata import tosec
 from systems import desktop
 from systems import megadrive
 from systems import snes
+import systems
 
 class BadnikLibrary(GamesManager.Library):
 	'''A games dedicated database'''
@@ -39,7 +40,7 @@ class BadnikLibrary(GamesManager.Library):
 		self.tosec = tosec.TOSEC(save_data_dir)
 		
 		self.add_system(desktop.Desktop())
-		#self.add_system(GamesManager.Doom())
+		self.add_system(systems.Doom())
 		#self.add_system(snes.SNES(self))
 		self.add_system(megadrive.MegaDrive(self))
 

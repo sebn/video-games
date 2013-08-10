@@ -25,7 +25,7 @@ namespace GamesManager {
 		
 		public bool
 		query_is_valid () {
-			return identification == "IWAD" || identification == "PWAD";
+			return identification == "IWAD";
 		}
 	}
 	
