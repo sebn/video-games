@@ -137,6 +137,9 @@ namespace GamesManager {
 		get_game_exec (Library library, int game_id) {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
+			
+			var emulator = Environment.find_program_in_path("gens");
+			stdout.printf("EMULATOR: %s\n", emulator);
 			return @"gens --fs --render-mode 2 --quickexit --enable-perfectsynchro \"$(file.get_path())\"";
 		}
 		
