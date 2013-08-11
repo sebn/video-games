@@ -24,7 +24,6 @@ from gi.repository import GamesManager
 
 from metadata import tosec
 from systems import desktop
-from systems import snes
 import systems
 
 class BadnikLibrary(GamesManager.Library):
@@ -35,11 +34,7 @@ class BadnikLibrary(GamesManager.Library):
 		self.app = app
 		self.path = os.path.join(save_data_dir, "games.db")
 		
-		# Init the TOSEC databases
-		self.tosec = tosec.TOSEC(save_data_dir)
-		
 		self.add_system(desktop.Desktop())
 		self.add_system(systems.Doom())
-		#self.add_system(snes.SNES(self))
 		self.add_system(systems.MegaDrive(self))
 

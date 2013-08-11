@@ -33,6 +33,12 @@ DEVICES_ICONS = game-system-megadrive-jp.png \
 
 INSTALLED_DEVICE_ICONS = $(DEVICES_ICONS:%=$(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%)
 
+CLRMAMEPRO_DOCS = doom.dat \
+                  megadrive.dat \
+                  snes.dat
+
+INSTALLED_CLRMAMEPRO_DOCS = $(CLRMAMEPRO_DOCS:%=$(prefix)/share/$(LIB_NAME)/clrmamepro/%)
+
 all: $(VALAC_OUTPUT) $(GI_TYPELIB)
 
 $(VALAC_OUTPUT): $(SOURCES)
@@ -41,13 +47,15 @@ $(VALAC_OUTPUT): $(SOURCES)
 $(GI_TYPELIB): $(GI_REPOSITORY)
 	g-ir-compiler --shared-library=$(SHARED_OBJECT) --output=$@ $(GI_REPOSITORY)
 
-install: all $(INSTALLED_DEVICE_ICONS)
+install: all $(INSTALLED_DEVICE_ICONS) $(INSTALLED_CLRMAMEPRO_DOCS)
 	install -D $(SHARED_OBJECT) $(libdir)/$(PKG_NAME)/$(SHARED_OBJECT)
 	install -D $(GI_TYPELIB) $(libdir)/$(PKG_NAME)/girepository-1.0/$(GIR_NAME)-$(GIR_VERSION).typelib
 
 $(INSTALLED_DEVICE_ICONS): $(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%: data/icons/%
 	install -D $< $@
-	
+
+$(INSTALLED_CLRMAMEPRO_DOCS): $(prefix)/share/$(LIB_NAME)/clrmamepro/%: data/clrmamepro/%
+	install -D $< $@
 
 clean:
 	rm -f $(VALAC_OUTPUT) $(GI_TYPELIB)

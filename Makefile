@@ -33,8 +33,6 @@ SOURCES = \
 	src/systems/__init__.py \
 	src/systems/tosecsystem.py \
 	src/systems/desktop.py \
-	src/systems/megadrive.py \
-	src/systems/snes.py \
 	src/systems/utils.py \
 	src/ressources/app-menu.ui
 

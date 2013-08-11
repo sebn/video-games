@@ -1,0 +1,393 @@
+clrmamepro (
+	name "DOOM Engine - WADs"
+	description "DOOM Engine - WADs"
+	category "Standard DatFile"
+	version 2011-03-08
+	author Q-Marine
+	comment http://www.q-marine.de/wad-dat/
+)
+
+game (
+	name "[4 Level Demo] HeXen"
+	description "[4 Level Demo] HeXen"
+	year ""
+	manufacturer ""
+	rom ( name "[4 Level Demo] HeXen.wad" size 10644136 crc 77cd26c4 sha1 fa89a2475855e43c7f7e3198d6e4c4bee23bfab9 date "1995-10-18 01:32:42" )
+)
+
+game (
+	name "[Fix] Final DOOM - Evilution"
+	description "[Fix] Final DOOM - Evilution"
+	year ""
+	manufacturer ""
+	rom ( name tnt31.wad size 282000 crc 047b7add sha1 d292445192dd1ecb6e6e5350443755b9b2073255 date "1997-01-05 15:56:32" )
+)
+
+game (
+	name "[Shareware] DOOM v0.99"
+	description "[Shareware] DOOM v0.99"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v0.99.wad" size 4207819 crc eedae672 sha1 fc0359e191bd257b3507863ae412ef3250515866 date "1993-12-10 01:00:00" )
+)
+
+game (
+	name "[Shareware] DOOM v1.1"
+	description "[Shareware] DOOM v1.1"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.1.wad" size 4274218 crc 981dcebb sha1 d4dc6806abd96bd93570c8df436fb6956e13d910 date "1993-12-16 01:01:00" )
+)
+
+game (
+	name "[Shareware] DOOM v1.2"
+	description "[Shareware] DOOM v1.2"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.2.wad" size 4225504 crc bc842626 sha1 77ef34de7f13dc36b792fb82ed6805e9c1dc7afc date "1994-02-17 01:20:00" )
+)
+
+game (
+	name "[Shareware] DOOM v1.25 (Sybex)"
+	description "[Shareware] DOOM v1.25 (Sybex)"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.25 (Sybex).wad" size 4225460 crc 225d7fb1 sha1 72caf585f7ce56861d25f8580c1cc82bf50abd1b date "1994-04-21 17:05:58" )
+)
+
+game (
+	name "[Shareware] DOOM v1.4 (beta)"
+	description "[Shareware] DOOM v1.4 (beta)"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.4 (beta).wad" size 4261144 crc f5c2708d sha1 b4a8e93f1f9544210a173035a0b04c19eb283a2a date "1994-06-28 01:04:00" )
+)
+
+game (
+	name "[Shareware] DOOM v1.5 (beta)"
+	description "[Shareware] DOOM v1.5 (beta)"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.5 (beta).wad" size 4271324 crc 8653b0eb sha1 b559ba93d0a96e242eb6ded9deeedbd6f79d40fc date "1994-07-08 01:05:00" )
+)
+
+game (
+	name "[Shareware] DOOM v1.6 (beta)"
+	description "[Shareware] DOOM v1.6 (beta)"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.6 (beta).wad" size 4211660 crc f26dcad8 sha1 1437fc1ac25a17d5b3cef4c9d2f74e40cae3d231 date "1994-08-03 01:06:00" )
+)
+
+game (
+	name "[Shareware] DOOM v1.666"
+	description "[Shareware] DOOM v1.666"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.666.wad" size 4234124 crc 505fb740 sha1 81535778d0d4c0c7aa8616fbfd3607dfb3dfd643 date "1994-09-01 15:50:32" )
+)
+
+game (
+	name "[Shareware] DOOM v1.8"
+	description "[Shareware] DOOM v1.8"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.8.wad" size 4196020 crc 331ebf07 sha1 c6612ac5a8ac2e2a1d707f9b2869af820efb7c50 date "1995-01-20 01:08:02" )
+)
+
+game (
+	name "[Shareware] DOOM v1.9"
+	description "[Shareware] DOOM v1.9"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] DOOM v1.9.wad" size 4196020 crc 162b696a sha1 5b2e249b9c5133ec987b3ea77596381dc0d6bc1d date "1995-02-01 01:09:04" )
+)
+
+game (
+	name "[Shareware] HACX v1.0"
+	description "[Shareware] HACX v1.0"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] HACX v1.0.wad" size 9745911 crc 5e11e85e sha1 126432aef79cf85c7e1134e88174880b38610008 date "1997-09-30 23:40:12" )
+)
+
+game (
+	name "[Shareware] Heretic v1.0"
+	description "[Shareware] Heretic v1.0"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] Heretic v1.0.wad" size 5120300 crc 884a3e45 sha1 5ef073366e5ca523b26a529e843f05c4907c23a4 date "1994-12-24 00:17:46" )
+)
+
+game (
+	name "[Shareware] Heretic v1.2"
+	description "[Shareware] Heretic v1.2"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] Heretic v1.2.wad" size 5120920 crc 22d3f0ca sha1 b4c50ca9bea07f7c35250a1a11906091971c05ae date "1995-06-28 01:02:58" )
+)
+
+game (
+	name "[Shareware] Strife v1.1"
+	description "[Shareware] Strife v1.1"
+	year ""
+	manufacturer ""
+	rom ( name "[Shareware] Strife v1.1.wad" size 9934413 crc 93c144dd sha1 bc0a110bf27aee89a0b2fc8111e2391ede891b8d date "1996-03-14 17:23:18" )
+)
+
+game (
+	name "[Voices] Strife"
+	description "[Voices] Strife"
+	year ""
+	manufacturer ""
+	rom ( name "[Voices] Strife.wad" size 27319149 crc cd12ebcf sha1 ec6883100d807b894a98f426d024d22c77b63e7f date "1996-04-15 15:49:46" )
+)
+
+game (
+	name "Chex Quest"
+	description "Chex Quest"
+	year ""
+	manufacturer ""
+	rom ( name "Chex Quest.wad" size 12361532 crc 298dd5b5 sha1 eca9cff1014ce5081804e193588d96c6ddb35432 date "1996-10-31 17:44:40" )
+)
+
+game (
+	name "Chex Quest 2"
+	description "Chex Quest 2"
+	year ""
+	manufacturer ""
+	rom ( name "Chex Quest 2.wad" size 7585664 crc 30aab11e sha1 d5b970834b8ff364d377ef04eb7d12fa6035e10a date "1997-02-05 16:37:42" )
+)
+
+game (
+	name "Chex Quest 3 (beta)"
+	description "Chex Quest 3 (beta)"
+	year ""
+	manufacturer ""
+	rom ( name "Chex Quest 3 (beta).wad" size 9348448 crc a6a5bf06 sha1 100fd7b4dec9dd299d7756cc3a6a419a94264926 date "2001-01-16 22:47:06" )
+)
+
+game (
+	name "DOOM (alpha) v0.2"
+	description "DOOM (alpha) v0.2"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM (alpha) v0.2.wad" size 496250 crc 2587d97b sha1 89d934616c57fe974b06c2b37a9837853a89dbbc date "1993-02-04 15:20:50" )
+)
+
+game (
+	name "DOOM (alpha) v0.4"
+	description "DOOM (alpha) v0.4"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM (alpha) v0.4.wad" size 2675669 crc c8a8b5ea sha1 5f78b23fbffc828f5863ecff7e908d556241ff45 date "1993-04-02 22:34:54" )
+)
+
+game (
+	name "DOOM (alpha) v0.5"
+	description "DOOM (alpha) v0.5"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM (alpha) v0.5.wad" size 3522207 crc 8fe33445 sha1 d3648d720b5324ce3c7bf58cf019e395911d677e date "1993-05-22 18:00:48" )
+)
+
+game (
+	name "DOOM II v1.666"
+	description "DOOM II v1.666"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM II v1.666.wad" size 14943400 crc e2a683bd sha1 6d559b7ceece4f5ad457415049711992370d520a date "1994-08-25 21:13:52" )
+)
+
+game (
+	name "DOOM II v1.666 (german)"
+	description "DOOM II v1.666 (german)"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM II v1.666 (german).wad" size 14824716 crc c08005f7 sha1 a4ce5128d57cb129fdd1441c12b58245be55c8ce date "1994-08-29 18:30:10" )
+)
+
+game (
+	name "DOOM II v1.7"
+	description "DOOM II v1.7"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM II v1.7.wad" size 14612688 crc 47daeb2e sha1 78009057420b792eacff482021db6fe13b370dcc date "1994-09-21 18:38:08" )
+)
+
+game (
+	name "DOOM II v1.7a"
+	description "DOOM II v1.7a"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM II v1.7a.wad" size 14612688 crc 952f6baa sha1 70192b8d5aba65c7e633a7c7bcfe7e3e90640c97 date "1994-10-18 13:56:20" )
+)
+
+game (
+	name "DOOM II v1.8"
+	description "DOOM II v1.8"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM II v1.8.wad" size 14612688 crc 31bd3bc0 sha1 79c283b18e61b9a989cfd3e0f19a42ea98fda551 date "1995-01-20 01:08:00" )
+)
+
+game (
+	name "DOOM II v1.9"
+	description "DOOM II v1.9"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM II v1.9.wad" size 14604584 crc ec8725db sha1 7ec7652fcfce8ddc6e801839291f0e28ef1d5ae7 date "1996-05-29 08:04:46" )
+)
+
+game (
+	name "DOOM Press-Release Beta"
+	description "DOOM Press-Release Beta"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM Press-Release Beta.wad" size 5468456 crc ff9bd960 sha1 692994db9579be4201730b9ac77797fae2111bde date "1993-10-04 18:44:46" )
+)
+
+game (
+	name "DOOM v1.1"
+	description "DOOM v1.1"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM v1.1.wad" size 10396254 crc 66457ab9 sha1 df0040ccb29cc1622e74ceb3b7793a2304cca2c8 date "1993-12-16 13:35:38" )
+)
+
+game (
+	name "DOOM v1.2"
+	description "DOOM v1.2"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM v1.2.wad" size 10399316 crc a5da8930 sha1 b5f86a559642a2b3bdfb8a75e91c8da97f057fe6 date "1994-02-17 01:20:00" )
+)
+
+game (
+	name "DOOM v1.666"
+	description "DOOM v1.666"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM v1.666.wad" size 11159840 crc f756aab5 sha1 2e89b86859acd9fc1e552f587b710751efcffa8e date "1994-09-01 16:42:00" )
+)
+
+game (
+	name "DOOM v1.9"
+	description "DOOM v1.9"
+	year ""
+	manufacturer ""
+	rom ( name "DOOM v1.9.wad" size 11159840 crc 723e60f9 sha1 7742089b4468a736cadb659a7deca3320fe6dcbd date "1995-02-01 01:09:04" )
+)
+
+game (
+	name "Final DOOM - Evilution"
+	description "Final DOOM - Evilution"
+	year ""
+	manufacturer ""
+	rom ( name "Final DOOM - Evilution.wad" size 18195736 crc 903dcc27 sha1 9fbc66aedef7fe3bae0986cdb9323d2b8db4c9d3 date "1996-06-10 01:00:02" )
+)
+
+game (
+	name "Final DOOM - The Plutonia Experiment"
+	description "Final DOOM - The Plutonia Experiment"
+	year ""
+	manufacturer ""
+	rom ( name "Final DOOM - The Plutonia Experiment.wad" size 17420824 crc 48d1453c sha1 90361e2a538d2388506657252ae41aceeb1ba360 date "2001-09-06 19:30:10" )
+)
+
+game (
+	name "HACX v1.1"
+	description "HACX v1.1"
+	year ""
+	manufacturer ""
+	rom ( name "HACX v1.1.wad" size 22102300 crc b95a03d2 sha1 1125a16243d1e1d5259e0f387d955382432f1424 date "1997-09-16 10:40:36" )
+)
+
+game (
+	name "HACX v1.2"
+	description "HACX v1.2"
+	year ""
+	manufacturer ""
+	rom ( name "HACX v1.2.wad" size 19321722 crc 72e3b8ac sha1 9fd331b9d53006af1884e89eaeb97b17b8572b71 date "2011-03-08 21:53:10" )
+)
+
+game (
+	name "Heretic - Shadow of the Serpent Riders v1.3"
+	description "Heretic - Shadow of the Serpent Riders v1.3"
+	year ""
+	manufacturer ""
+	rom ( name "Heretic - Shadow of the Serpent Riders v1.3.wad" size 14189976 crc 5b16049e sha1 f489d479371df32f6d280a0cb23b59a35ba2b833 date "1996-03-22 01:03:00" )
+)
+
+game (
+	name "Heretic v1.0"
+	description "Heretic v1.0"
+	year ""
+	manufacturer ""
+	rom ( name "Heretic v1.0.wad" size 11096488 crc 77482d1e sha1 b5a6cc79cde48d97905b44282e82c4c966a23a87 date "1994-12-27 00:33:46" )
+)
+
+game (
+	name "Heretic v1.2"
+	description "Heretic v1.2"
+	year ""
+	manufacturer ""
+	rom ( name "Heretic v1.2.wad" size 11095516 crc 54759180 sha1 a54c5d30629976a649119c5ce8babae2ddfb1a60 date "1995-06-28 01:02:58" )
+)
+
+game (
+	name "HeXen - Beyond Heretic v1.0"
+	description "HeXen - Beyond Heretic v1.0"
+	year ""
+	manufacturer ""
+	rom ( name "HeXen - Beyond Heretic v1.0.wad" size 20128392 crc eece0236 sha1 ac129c4331bf26f0f080c4a56aaa40d64969c98a date "1995-10-13 18:18:02" )
+)
+
+game (
+	name "HeXen - Beyond Heretic v1.1"
+	description "HeXen - Beyond Heretic v1.1"
+	year ""
+	manufacturer ""
+	rom ( name "HeXen - Beyond Heretic v1.1.wad" size 20083672 crc dca9114c sha1 4b53832f0733c1e29e5f1de2428e5475e891af29 date "1996-03-14 01:01:00" )
+)
+
+game (
+	name "HeXen - Deathkings of the Dark Citadel"
+	description "HeXen - Deathkings of the Dark Citadel"
+	year ""
+	manufacturer ""
+	rom ( name "HeXen - Deathkings of the Dark Citadel.wad" size 4429700 crc 0c20539a sha1 c3065527d62b05a930fe75fe8181a64fb1982976 date "1996-03-22 01:00:00" )
+)
+
+game (
+	name "HeXen - Deathkings of the Dark Citadel (fixed)"
+	description "HeXen - Deathkings of the Dark Citadel (fixed)"
+	year ""
+	manufacturer ""
+	rom ( name "HeXen - Deathkings of the Dark Citadel (fixed).wad" size 4440584 crc fd5eb11d sha1 081f6a2024643b54ef4a436a85508539b6d20a1e date "1996-05-09 17:34:02" )
+)
+
+game (
+	name "Strife v1.0"
+	description "Strife v1.0"
+	year ""
+	manufacturer ""
+	rom ( name "Strife v1.0.wad" size 28372168 crc b7581abd sha1 eb0f3e157b35c34d5a598701f775e789ec85b4ae date "1996-04-18 18:43:24" )
+)
+
+game (
+	name "Strife v1.2"
+	description "Strife v1.2"
+	year ""
+	manufacturer ""
+	rom ( name "Strife v1.2.wad" size 28377364 crc 4234ace5 sha1 64c13b951a845ca7f8081f68138a6181557458d1 date "1996-05-23 18:03:58" )
+)
+
+game (
+	name "The Ultimate DOOM v1.9u"
+	description "The Ultimate DOOM v1.9u"
+	year ""
+	manufacturer ""
+	rom ( name "The Ultimate DOOM v1.9u.wad" size 12408292 crc bf0eaac0 sha1 9b07b02ab3c275a6a7570c3f73cc20d63a0e3833 date "1996-06-12 21:59:02" )
+)
+

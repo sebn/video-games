@@ -80,7 +80,7 @@ namespace GamesManager {
 		}
 	}
 	
-	public abstract class MegaDrive : System {
+	public class MegaDrive : System {
 		private const string[] BLACK_LIST = {
 			"gens.desktop", 
 			"dribble-gens.desktop" };
