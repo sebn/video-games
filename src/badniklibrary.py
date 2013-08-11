@@ -22,7 +22,6 @@ import os.path
 
 from gi.repository import GamesManager
 
-from metadata import tosec
 from systems import desktop
 import systems
 
