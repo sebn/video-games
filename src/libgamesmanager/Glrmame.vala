@@ -159,9 +159,28 @@ namespace GamesManager.Glrmame {
 			return words;
 		}
 		
-		private void
-		parse_file () {
+		public Game?
+		search_game (string path) {
+			var file = File.new_for_path (path);
+			var info = file.query_info("*", FileQueryInfoFlags.NONE);
 			
+			var size = info.get_size();
+			var data = new uchar[size];
+			file.read().read(data);
+			
+			var md5 = Checksum.compute_for_data (ChecksumType.MD5, data);
+			var sha1 = Checksum.compute_for_data (ChecksumType.SHA1, data);
+			
+			stdout.printf("Searching for file `%s` of size %lli, of MD5 %s and of SHA1 %s.\n", path, size, md5, sha1);
+			
+			foreach (Game game in games) {
+				if (game.rom != null && game.rom.size != null && int64.parse (game.rom.size) == size) {
+					if (game.rom.md5 != null && game.rom.md5.down() == md5) return game;
+					if (game.rom.sha1 != null && game.rom.sha1.down() == sha1) return game;
+				}
+			}
+			
+			return null;
 		}
 	}
 	
