@@ -85,25 +85,48 @@ namespace GamesManager {
 			"gens.desktop", 
 			"dribble-gens.desktop" };
 		
+		private Glrmame.Document document;
+		
 		public MegaDrive () {
 			Object (reference: "megadrive", game_search_type: GameSearchType.STANDARD);
+		}
+		
+		construct {
+			document = new Glrmame.Document("/home/kekun/badnik/src/libgamesmanager/data/glrmame/megadrive.dat");
 		}
 		
 		public override string[]
 		get_application_black_list () {
 			return BLACK_LIST;
 		}
-		/*
+		
+		public override string
+		get_name () {
+			return "Mega Drive / Genesis";
+		}
+		
 		public override GameInfo
 		get_game_info (Library library, int game_id) {
+			var info = library.get_default_game_info (game_id);
 			
+			var uri = library.get_game_uri(game_id);
+			var file = File.new_for_uri(uri);
+			
+			var glrmame_info = document.search_game(file);
+			
+			info.title = glrmame_info != null && glrmame_info.name != null ? glrmame_info.name : file.get_basename();
+			info.icon = "game-system-megadrive-jp";
+			
+			return info;
 		}
 		
 		public override string
 		get_game_exec (Library library, int game_id) {
-			
+			var uri = library.get_game_uri(game_id);
+			var file = File.new_for_uri(uri);
+			return @"gens --fs --render-mode 2 --quickexit --enable-perfectsynchro \"$(file.get_path())\"";
 		}
-		*/
+		
 		public override bool
 		query_is_game_available (Library library, int game_id) {
 			var uri = library.get_game_uri(game_id);
@@ -127,15 +150,21 @@ namespace GamesManager {
 				return false;
 			}
 		}
-		/*
+		
 		public override string
 		get_game_reference_for_uri (string uri) {
+			var file = File.new_for_uri (uri);
+			var glrmame_info = document.search_game(file);
 			
+			var regex = new Regex ("^\"([^\\(\\)\\[\\]]+) .*?(\\(?[^\\[\\]]*\\)?)(\\[?[^\\(\\)]*\\]?)\"");
+			
+			var result = regex.split(glrmame_info.name);
+			return result.length > 0 ? result[0] : glrmame_info.name;
 		}
 		
 		public override GameInfo
 		download_game_metadata (Library library, int game_id) {
-			
-		}*/
+			return get_game_info (library, game_id);
+		}
 	}
 }

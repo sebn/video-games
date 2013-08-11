@@ -31,25 +31,3 @@ class MegaDrive(GamesManager.MegaDrive):
 		tosecdata = gamesdb.app.tosecdir + "/" + self.get_property("reference") + ".dat"
 		gamesdb.tosec.parse_file(tosecdata, self.get_property("reference"))
 		self.tosec = gamesdb.tosec
-	
-	def do_get_game_info(self, library, id):
-		info = library.get_default_game_info(id)
-		
-		game_path = get_path_from_uri(library.get_game_uri(id))
-		
-		info.set_property("title", self.tosec.get_game_title(game_path))
-		info.set_property("icon", "game-system-megadrive-jp.png")
-		
-		return info
-	
-	def do_get_game_exec(self, library, id):
-		game_path = get_path_from_uri(library.get_game_uri(id))
-		return 'gens --fs --render-mode 2 --quickexit --enable-perfectsynchro "' + game_path + '"'
-	
-	def do_get_game_reference_for_uri(self, uri):
-		game_path = get_path_from_uri(uri)
-		return self.tosec.get_game_title(game_path)
-	
-	def do_download_game_metadata(self, library, game_id):
-		return self.get_game_info(library, id)
-	

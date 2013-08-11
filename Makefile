@@ -47,8 +47,8 @@ ICONS = \
 	icons/hicolor/256x256/apps/$(APPNAME).png
 
 TOSEC = \
-	data/tosec/megadrive.dat \
-	data/tosec/snes.dat
+#	data/tosec/megadrive.dat \
+#	data/tosec/snes.dat
 
 SYSTEMICONS = \
 #	data/icons/megadrive.png \

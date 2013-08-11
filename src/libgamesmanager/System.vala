@@ -16,6 +16,11 @@ namespace GamesManager {
 		public abstract string[] get_application_black_list ();
 		
 		/**
+		 * Return the name of the system.
+		 */
+		public abstract string get_name ();
+		
+		/**
 		 * Return a GameInfo object containing as much informations as possible about the game.
 		 */
 		public abstract GameInfo get_game_info (Library library, int game_id);

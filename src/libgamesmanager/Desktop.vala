@@ -14,6 +14,11 @@ namespace GamesManager {
 			return BLACK_LIST;
 		}
 		
+		public override string
+		get_name () {
+			return "Desktop entry";
+		}
+		
 		public override GameInfo
 		get_game_info (Library library, int game_id) {
 			var info = library.get_default_game_info(game_id);
@@ -22,7 +27,6 @@ namespace GamesManager {
 			var file = File.new_for_uri(uri);
 			var desktop_app_info = new DesktopAppInfo.from_filename(file.get_path());
 			
-			info.system = reference;
 			info.title = desktop_app_info.get_name();
 			info.icon = desktop_app_info.get_icon().to_string();
 			

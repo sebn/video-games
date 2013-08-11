@@ -17,6 +17,8 @@
 #    
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
+from gi.repository import GamesManager
+
 import re
 import sqlite3
 import hashlib
@@ -102,6 +104,62 @@ class TOSEC:
 			
 			# Adding rom
 			rom_info = [rom_flags, rom["size"], rom["crc"], rom["md5"], rom["sha1"]]
+			rom_exists = False
+			for row in db.execute('SELECT id FROM roms WHERE flags = ? AND size = ? AND crc = ? AND md5 = ? AND sha1 = ?', rom_info):
+				rom_exists = True
+			if not rom_exists:
+				rom_info.append(game_id)
+				rom_info = [rom_flags, rom["size"], rom["crc"], rom["md5"], rom["sha1"], game_id]
+				db.execute('INSERT INTO roms(id, flags, size, crc, md5, sha1, game) VALUES (NULL, ?, ?, ?, ?, ?, ?)', rom_info)
+		
+		db.commit()
+		db.close()
+		return True
+	
+	def parse_file_with_vala(self, file, system):
+		'''Add a data file for the given system and update the database if this data file's version is newer than the previous one for the given system or simply add it if there was no database for this system.'''
+		document = GamesManager.Glrmame.Document(path = file)
+		
+		db = sqlite3.connect(self.path)
+		
+		# If the info don't have a version, it is not valid and the file shouldn't be added
+		if document.version == None:
+			return False
+		
+		new_version = document.version
+		
+		# Check the version actually in the database
+		actual_version = None
+		for row in db.execute('SELECT version FROM systems WHERE id = ?', [system]):
+			actual_version = row[0]
+		
+		# If the old version is more recent thab the new one, the new one shouldn't be added
+		if actual_version and datefromiso(actual_version) >= datefromiso(new_version):
+			return False
+		
+		# What if we have to update the version instead of adding it ?
+		if actual_version:
+			db.execute('UPDATE systems SET version = ? WHERE id = ?', [new_version, system])
+		else:
+			db.execute('INSERT INTO systems (id, version) VALUES (?, ?)', [system, new_version])
+		
+		for game in document.games:
+			rom = game.rom
+			title, game_flags, rom_flags = split_game_title(game.name)
+			
+			game_id = None
+			
+			# Adding game
+			game_info = [title, game_flags, system]
+			for row in db.execute('SELECT id FROM games WHERE title = ? AND flags = ? AND system = ?', game_info):
+				game_id = row[0]
+			if not game_id:
+				db.execute('INSERT INTO games(id, title, flags, system) VALUES (NULL, ?, ?, ?)', game_info)
+				for row in db.execute('SELECT id FROM games WHERE title = ? AND flags = ? AND system = ?', game_info):
+					game_id = row[0]
+			
+			# Adding rom
+			rom_info = [rom_flags, rom.size, rom.crc, rom.md5, rom.sha1]
 			rom_exists = False
 			for row in db.execute('SELECT id FROM roms WHERE flags = ? AND size = ? AND crc = ? AND md5 = ? AND sha1 = ?', rom_info):
 				rom_exists = True

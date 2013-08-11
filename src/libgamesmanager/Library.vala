@@ -303,7 +303,7 @@ namespace GamesManager {
 					info.icon = datamodel.get_value_at(3, 0).get_string();
 					info.cover = datamodel.get_value_at(4, 0).get_string();
 					info.released = datamodel.get_value_at(5, 0).get_string();
-					info.system = datamodel.get_value_at(6, 0).get_string();
+					info.system = systems.get(datamodel.get_value_at(6, 0).get_string());
 					info.genre = datamodel.get_value_at(7, 0).get_string();
 					info.played = datamodel.get_value_at(8, 0).get_double();
 					info.playedlast = datamodel.get_value_at(9, 0).get_double();
@@ -427,7 +427,8 @@ namespace GamesManager {
 		
 		
 		
-		public string get_game_uri (int game_id) throws Error {
+		public string
+		get_game_uri (int game_id) throws Error {
 			var uri = "";
 			
 			var cnn = open_connection();
@@ -450,7 +451,8 @@ namespace GamesManager {
 			}
 		}
 		
-		private void add_uri_for_game (int game_id, string uri) {
+		private void
+		add_uri_for_game (int game_id, string uri) {
 			var cnn = open_connection();
 			try {
 				stdout.printf("Add uri %s to game %i to the DB\n", uri, game_id);
@@ -462,7 +464,8 @@ namespace GamesManager {
 			cnn.close();
 		}
 		
-		protected bool query_uri_exists (string uri) {
+		protected bool
+		query_uri_exists (string uri) {
 			var cnn = open_connection();
 			try {
 				var datamodel = cnn.execute_select_command (@"SELECT id FROM uris WHERE uri = \"$(uri)\"");

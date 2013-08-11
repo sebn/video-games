@@ -30,13 +30,24 @@ namespace GamesManager {
 	}
 	
 	public class Doom : System {
+		private Glrmame.Document document;
+		
 		public Doom () {
 			Object (reference: "doom", game_search_type: GameSearchType.STANDARD);
+		}
+		
+		construct {
+			document = new Glrmame.Document("/home/kekun/badnik/src/libgamesmanager/data/glrmame/doom.dat");
 		}
 		
 		public override string[]
 		get_application_black_list () {
 			return {};
+		}
+		
+		public override string
+		get_name () {
+			return "Doom engine";
 		}
 		
 		public override GameInfo
@@ -46,7 +57,9 @@ namespace GamesManager {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			
-			info.title = file.get_basename();
+			var glrmame_info = document.search_game(file);
+			
+			info.title = glrmame_info != null && glrmame_info.name != null ? glrmame_info.name : file.get_basename();
 			info.icon = "gtk-floppy";
 			
 			return info;

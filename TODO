@@ -7,7 +7,6 @@ Badnik 0.2
 			Don't duplicate games (done except for concurrent access)
 		Clean up the single game view:
 			display screenshots
-			display a correct system name
 	
 	Workflow and code:
 		Polish the systems:
@@ -16,6 +15,7 @@ Badnik 0.2
 		Add a way to stop slow functions:
 			searching in the file system
 			searching for metadata
+		Improve URI management (deleting non existent ones, etc)
 
 Badnik 0.3
 	GUI:

@@ -22,3 +22,7 @@ from gi.repository import GamesManager
 class Doom(GamesManager.Doom):
 	def __init__(self):
 		GamesManager.Doom.__init__(self, reference = "doom")
+
+class MegaDrive(GamesManager.MegaDrive):
+	def __init__(self, gamesdb):
+		GamesManager.MegaDrive.__init__(self, reference = "megadrive")

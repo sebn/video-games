@@ -426,7 +426,7 @@ class GameView(Gtk.ScrolledWindow):
 		if info.get_property("system"):
 			self._system.show()
 			self.system.show()
-			self.system.set_text(info.get_property("system"))
+			self.system.set_text(info.get_property("system").get_name())
 		else:
 			self._system.hide()
 			self.system.hide()
