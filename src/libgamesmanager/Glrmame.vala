@@ -198,6 +198,118 @@ namespace GamesManager.Glrmame {
 		public string? sampleof { construct set; get; }
 		public string? year { construct set; get; }
 		public string? manufacturer { construct set; get; }
+		
+		public TOSECInfo query_tosec_info () throws Error {
+			var tosec_error = new Error (Quark.from_string ("tosec-name-parsing"), 1, "The name don't uses the TOSEC conventions.");
+			var regex_error = new Error (Quark.from_string ("regex-scheme"), 1, "The programmer can't do regex, blame him.");
+			
+			Regex regex;
+			var result = new string[0];
+			try {
+				regex = new Regex ("^\"([^\\(\\)\\[\\]]+) .*?(\\(?[^\\[\\]]*\\)?)(\\[?[^\\(\\)]*\\]?)\"");
+				result = regex.split(name);
+			}
+			catch (RegexError e) {
+				throw regex_error;
+			}
+			
+			var info = new TOSECInfo();
+			
+			if (result.length < 4) throw tosec_error;
+			
+			var title_info = result[1];
+			var game_info = result[2];  // The groups between parenthesis.
+			var rom_info = result[3];   // The groups between brackets.
+			
+			// Look for the title and the version.
+			
+			try {
+				regex = new Regex ("^(.*?)(?: (v[^ ]+?|Rev [^ ]+?))?$");
+				result = regex.split(title_info);
+			}
+			catch (RegexError e) {
+				throw regex_error;
+			}
+			
+			if (result.length < 3) throw tosec_error;
+			
+			info.title = result[1];
+			info.version = (result.length > 3 && result[2] != "") ? result[2] : null;
+			
+			// Look for the demo, the date and the publisher.
+			
+			try {
+				regex = new Regex ("""^(?:\((demo.*?)\) )?\(([^()]*?)\)\(([^()]*?)\)(.*?$)""");
+				result = regex.split(game_info);
+			}
+			catch (RegexError e) {
+				throw regex_error;
+			}
+			
+			if (result.length < 5) throw tosec_error;
+			
+			info.demo = (result[1] != "") ? result[1] : null;
+			info.date = result[2];
+			info.publisher = result[3];
+			
+			var game_info_rest = result[4];
+			
+			/* Look for the system, the video, the country, the language, the copyright,
+			 * the status, the development status, the media type and the media label.
+			 */
+			
+			var system_ex = """(?:\(([^()]*?)\))?"""; // May be too greedy because it is too generic.
+			var video_ex = """(?:\((CGA|EGA|HGC|MCGA|MDA|NTSC|NTSC-PAL|PAL|PAL-60|PAL-NTSC|SVGA|VGA|XGA)\))?""";
+			var country_ex = """(?:\(([A-Z]{2}(?:-[A-Z]{2})?)\))?""";
+			var language_ex = """(?:\(((?:[a-z]{2}(?:-[a-z]{2})?)|M[0-9])\))?""";
+			var copyright_ex = """(?:\((CW|CW-R|FW|GW|GW-R|LW|PD|SW|SW-R)\))?""";
+			var development_ex = """(?:\((alpha|beta|preview|pre-release|proto)\))?""";
+			var media_type_ex = """(?:\(((?:Disc|Disk|File|Part|Side|Tape) [^()]*?)\))?""";
+			var media_label_ex = """(?:\(([^()]*?)\))?"""; // May be too greedy because it is too generic.
+			
+			try {
+				regex = new Regex ("^" + video_ex + country_ex + language_ex + copyright_ex + development_ex + media_type_ex + "(.*?$)");
+				result = regex.split(game_info_rest);
+			}
+			catch (RegexError e) {
+				throw regex_error;
+			}
+			/*
+			uint i = 1;
+			//info.system = result[i] != "" ? result[i] : null; i++;
+			info.video = result[i] != "" ? result[i] : null; i++;
+			info.country = result[i] != "" ? result[i] : null; i++;
+			info.language = result[i] != "" ? result[i] : null; i++;
+			info.copyright = result[i] != "" ? result[i] : null; i++;
+			info.development = result[i] != "" ? result[i] : null; i++;
+			info.media_type = result[i] != "" ? result[i] : null; i++;
+			//info.media_label = result[i] != "" ? result[i] : null; i++;
+			
+			stdout.printf ("Parsing |%s||%s||%s|\n", title_info, game_info, rom_info);
+			foreach (string s in result) {
+				stdout.printf ("result: %s\n", s);
+			}
+			*/
+			return info;
+		}
+	}
+	
+	public class TOSECInfo : Object {
+		public string title { construct set; get; }
+		public string? version { construct set; get; }
+		public string? demo { construct set; get; }
+		public string date { construct set; get; }
+		public string publisher { construct set; get; }
+		public string? system { construct set; get; }
+		public string? video { construct set; get; }
+		public string? country { construct set; get; }
+		public string? language { construct set; get; }
+		public string? copyright { construct set; get; }
+		public string? development { construct set; get; }
+		public string? media_type { construct set; get; }
+		public string? media_label { construct set; get; }
+		public string? dump_info_flags { construct set; get; }
+		public string? more_info { construct set; get; }
 	}
 	
 	public class Rom : Object {
@@ -209,5 +321,14 @@ namespace GamesManager.Glrmame {
 		public string? crc32 { construct set; get; }
 		public string? md5 { construct set; get; }
 		public string? sha1 { construct set; get; }
+	}
+	
+	public string? get_clrmamepro_dir () {
+		foreach (string dir in Environment.get_system_data_dirs ()) {
+			var file = File.new_for_path (dir);
+			file = file.get_child("libgamesmanager/clrmamepro");
+			if (file.query_exists()) return file.get_path();
+		}
+		return null;
 	}
 }

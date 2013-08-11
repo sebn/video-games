@@ -27,7 +27,6 @@ import urllib
 from gi.repository import Gtk
 from gi.repository import GamesManager
 
-from systems.basesystem import BaseSystem
 from metadata import mobygames
 
 class Desktop(GamesManager.Desktop):

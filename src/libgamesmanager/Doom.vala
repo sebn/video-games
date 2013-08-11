@@ -37,7 +37,14 @@ namespace GamesManager {
 		}
 		
 		construct {
-			document = new Glrmame.Document("/home/kekun/badnik/src/libgamesmanager/data/glrmame/doom.dat");
+			var clrmamepro_dir = Glrmame.get_clrmamepro_dir ();
+			
+			if (clrmamepro_dir != null) {
+				var file = File.new_for_path (clrmamepro_dir);
+				file = file.get_child (@"$(reference).dat");
+				if (file.query_exists ())
+					document = new Glrmame.Document(file.get_path ());
+			}
 		}
 		
 		public override string[]
@@ -59,7 +66,13 @@ namespace GamesManager {
 			
 			var glrmame_info = document.search_game(file);
 			
-			info.title = glrmame_info != null && glrmame_info.name != null ? glrmame_info.name : file.get_basename();
+			try {
+				var tosec_info = glrmame_info.query_tosec_info ();
+				info.title = tosec_info.title;
+			}
+			catch (Error e) {
+				info.title = file.get_basename();
+			}
 			info.icon = "gtk-floppy";
 			
 			return info;
@@ -98,9 +111,16 @@ namespace GamesManager {
 		
 		public override string
 		get_game_reference_for_uri (string uri) {
-			var file = File.new_for_uri(uri);
-			var splitted_name = file.get_basename().split(".");
-			return splitted_name[0].down();
+			var file = File.new_for_uri (uri);
+			var glrmame_info = document.search_game(file);
+			try {
+				var tosec_info = glrmame_info.query_tosec_info ();
+				
+				return tosec_info.title;
+			}
+			catch (Error e) {
+				return file.get_basename ();
+			}
 		}
 		
 		public override GameInfo
