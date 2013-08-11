@@ -29,9 +29,7 @@ SOURCES = \
 	src/main.py \
 	src/metadata/__init__.py \
 	src/metadata/mobygames.py \
-	src/metadata/tosec.py \
 	src/systems/__init__.py \
-	src/systems/tosecsystem.py \
 	src/systems/desktop.py \
 	src/systems/utils.py \
 	src/ressources/app-menu.ui
