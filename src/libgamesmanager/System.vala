@@ -49,5 +49,15 @@ namespace GamesManager {
 		 * Return an unique reference for this game on this system.
 		 */
 		public abstract GameInfo download_game_metadata (Library library, int game_id);
+		
+		public static bool
+		query_program_exists (string program) {
+			var path = Environment.find_program_in_path("gens");
+			
+			if (path == null) return false;
+			
+			var file = File.new_for_path (path);
+			return file.query_exists ();
+		}
 	}
 }

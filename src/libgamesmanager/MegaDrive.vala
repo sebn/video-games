@@ -1,5 +1,7 @@
 namespace GamesManager {
 	public class MegaDriveROMHeader : Object {
+		private string path { set; get; }
+		
 		public string console_name { set; get; }
 		public string release_date { set; get; }
 		public string domestic_name { set; get; }
@@ -17,6 +19,7 @@ namespace GamesManager {
 		public string notes { set; get; }
 		
 		public MegaDriveROMHeader (string path) throws Error {
+			this.path = path;
 			var file = File.new_for_path(path);
 			var file_stream = file.read ();
 			var data_stream = new DataInputStream (file_stream);
@@ -78,6 +81,30 @@ namespace GamesManager {
 		query_is_valid () {
 			return console_name == "SEGA GENESIS    " || console_name == "SEGA MEGA DRIVE ";
 		}
+		
+		public string
+		query_release_date () throws Error {
+			try {
+				var regex = new Regex ("""([0-9]{4}).([A-Z]{3})$""");
+				var result = regex.split(release_date);
+				
+				if (result.length < 3) throw new Error (Quark.from_string ("megadrive-header-format"), 1, "The header of the megadrive ROM `%s' is malformed: can't retrieve the release date.", path);
+				
+				var year = result [1];
+				var month = "";
+				
+				string[] months = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+				for (int i = 0 ; i < 12 && month == "" ; i++) {
+					if (months[i] == result[2]) {
+						month = (i+1).to_string ("%.2i");
+					}
+				}
+				return year + "-" + month;
+			}
+			catch (RegexError e) {
+				throw new Error (Quark.from_string ("regex-scheme"), 1, "The programmer can't do regex, blame him.");
+			}
+		}
 	}
 	
 	public class MegaDrive : System {
@@ -119,11 +146,21 @@ namespace GamesManager {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			
+			var header = new MegaDriveROMHeader (file.get_path ());
+			
 			var glrmame_info = document.search_game(file);
 			
 			try {
 				var tosec_info = glrmame_info.query_tosec_info ();
 				info.title = tosec_info.title;
+				info.developer = tosec_info.publisher;
+				
+				try {
+					info.released = header.query_release_date ();
+				}
+				catch (Error e) {
+					if (tosec_info.date != null) info.released = tosec_info.date;
+				}
 			}
 			catch (Error e) {
 				info.title = file.get_basename();
@@ -138,9 +175,10 @@ namespace GamesManager {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			
-			var emulator = Environment.find_program_in_path("gens");
-			stdout.printf("EMULATOR: %s\n", emulator);
-			return @"gens --fs --render-mode 2 --quickexit --enable-perfectsynchro \"$(file.get_path())\"";
+			if (query_program_exists ("gens"))
+				return @"gens --fs --render-mode 2 --quickexit --enable-perfectsynchro \"$(file.get_path())\"";
+			else
+				return "";
 		}
 		
 		public override bool

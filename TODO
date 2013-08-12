@@ -3,17 +3,14 @@ Badnik 0.2
 		Clean up the main games view:
 			Update it regularly:
 				search for new games
-				if a game isn't available anymore, remove it from the GUI
-			Don't duplicate games (done except for concurrent access)
 		Clean up the single game view:
 			display screenshots
 	
 	Workflow and code:
 		Polish the systems:
-			improve metadata downloading
+			improve metadata downloading (no wrong results, screenshots...)
 		Add more comments to the Vala code
 		Add a way to stop slow functions:
-			searching in the file system
 			searching for metadata
 		Improve URI management (deleting non existent ones, etc)
 
