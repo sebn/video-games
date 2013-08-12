@@ -67,11 +67,13 @@ namespace GamesManager {
 			var glrmame_info = document.search_game(file);
 			
 			try {
-				var tosec_info = glrmame_info.query_tosec_info ();
-				info.title = tosec_info.title;
+				var regex = new Regex ("^\"(?:\\[[^\\[\\]]*?\\] )?(.*?)(?: \\([^()]*?\\))?(?: v[^ ]*?)?(?: \\([^()]*?\\))?\"$");
+				var result = regex.split(glrmame_info.name);
+				
+				info.title = (result.length > 2) ? result[1] : file.get_basename ();
 			}
-			catch (Error e) {
-				info.title = file.get_basename();
+			catch (RegexError e) {
+				info.title = file.get_basename ();
 			}
 			info.icon = "gtk-floppy";
 			
@@ -114,11 +116,12 @@ namespace GamesManager {
 			var file = File.new_for_uri (uri);
 			var glrmame_info = document.search_game(file);
 			try {
-				var tosec_info = glrmame_info.query_tosec_info ();
+				var regex = new Regex ("^\"(?:\\[[^\\[\\]]*?\\] )?(.*?)(?: \\([^()]*?\\))?(?: v[^ ]*?)?(?: \\([^()]*?\\))?\"$");
+				var result = regex.split(glrmame_info.name);
 				
-				return tosec_info.title;
+				return (result.length > 2) ? result[1] : file.get_basename ();
 			}
-			catch (Error e) {
+			catch (RegexError e) {
 				return file.get_basename ();
 			}
 		}
