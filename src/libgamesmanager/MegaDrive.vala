@@ -190,7 +190,7 @@ namespace GamesManager {
 				if (info.title == null) info.title = nointro_info.title;
 			}
 			
-			info.icon = "game-system-megadrive-jp";
+			info.icon = "media-mega-drive-cartridge-eu";
 			
 			// Get the available countries for the game.
 			var available_countries = new string[0];

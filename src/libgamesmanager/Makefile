@@ -28,7 +28,7 @@ VAPI_DIR = --vapidir=.
 
 ICON_THEME = hicolor
 
-DEVICES_ICONS = game-system-megadrive-jp.png \
+DEVICES_ICONS = media-mega-drive-cartridge-eu.png \
                 game-system-superfamicom.png
 
 INSTALLED_DEVICE_ICONS = $(DEVICES_ICONS:%=$(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%)
