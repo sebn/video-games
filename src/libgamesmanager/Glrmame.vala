@@ -198,8 +198,27 @@ namespace GamesManager.Glrmame {
 		public string? sampleof { construct set; get; }
 		public string? year { construct set; get; }
 		public string? manufacturer { construct set; get; }
+	}
+	
+	public class TOSEC : Object {
+		public string title { construct set; get; }
+		public string? version { construct set; get; }
+		public string? demo { construct set; get; }
+		public string date { construct set; get; }
+		public string publisher { construct set; get; }
+		public string? system { construct set; get; }
+		public string? video { construct set; get; }
+		public string[] countries { construct set; get; default = {}; }
+		public string[] languages { construct set; get; default = {}; }
+		public string? copyright { construct set; get; }
+		public string? development { construct set; get; }
+		public string? media_type { construct set; get; }
+		public string? media_label { construct set; get; }
+		public string? dump_info_flags { construct set; get; }
+		public string? more_info { construct set; get; }
 		
-		public TOSECInfo query_tosec_info () throws Error {
+		public
+		TOSEC (Game game) throws Error {
 			var tosec_error = new Error (Quark.from_string ("tosec-name-parsing"), 1, "The name don't uses the TOSEC conventions.");
 			var regex_error = new Error (Quark.from_string ("regex-scheme"), 1, "The programmer can't do regex, blame him.");
 			
@@ -207,13 +226,11 @@ namespace GamesManager.Glrmame {
 			var result = new string[0];
 			try {
 				regex = new Regex ("^\"([^\\(\\)\\[\\]]+) .*?(\\(?[^\\[\\]]*\\)?)(\\[?[^\\(\\)]*\\]?)\"");
-				result = regex.split(name);
+				result = regex.split(game.name);
 			}
 			catch (RegexError e) {
 				throw regex_error;
 			}
-			
-			var info = new TOSECInfo();
 			
 			if (result.length < 4) throw tosec_error;
 			
@@ -231,10 +248,14 @@ namespace GamesManager.Glrmame {
 				throw regex_error;
 			}
 			
-			if (result.length < 3) throw tosec_error;
+			if (result.length < 3 || result[1] == "") throw tosec_error;
 			
-			info.title = result[1];
-			info.version = (result.length > 3 && result[2] != "") ? result[2] : null;
+			title = result[1];
+			version = (result.length > 3 && result[2] != "") ? result[2] : null;
+			
+			stdout.printf ("title_info: %s\n", title_info);
+			stdout.printf ("title     : %s\n", title);
+			stdout.printf ("version   : %s\n", version);
 			
 			// Look for the demo, the date and the publisher.
 			
@@ -248,9 +269,9 @@ namespace GamesManager.Glrmame {
 			
 			if (result.length < 5) throw tosec_error;
 			
-			info.demo = (result[1] != "") ? result[1] : null;
-			info.date = result[2];
-			info.publisher = result[3];
+			demo = (result[1] != "") ? result[1] : null;
+			date = result[2];
+			publisher = result[3];
 			
 			var game_info_rest = result[4];
 			
@@ -276,35 +297,39 @@ namespace GamesManager.Glrmame {
 			}
 			
 			uint i = 1;
-			//info.system = result[i] != "" ? result[i] : null; i++;
-			info.video = result[i] != "" ? result[i] : null; i++;
-			info.countries = result[i] != null && result[i] != "" ? result[i].split("-") : new string[0]; i++;/*
-			info.languages = result[i] != null && result[i] != "" ? result[i].split("-") : new string[0]; i++;
-			info.copyright = result[i] != "" ? result[i] : null; i++;
-			info.development = result[i] != "" ? result[i] : null; i++;
-			info.media_type = result[i] != "" ? result[i] : null; i++;*/
-			//info.media_label = result[i] != "" ? result[i] : null; i++;
-			
-			return info;
+			//system = result[i] != "" ? result[i] : null; i++;
+			video = result[i] != "" ? result[i] : null; i++;
+			countries = result[i] != null && result[i] != "" ? result[i].split("-") : new string[0]; i++;/*
+			languages = result[i] != null && result[i] != "" ? result[i].split("-") : new string[0]; i++;
+			copyright = result[i] != "" ? result[i] : null; i++;
+			development = result[i] != "" ? result[i] : null; i++;
+			media_type = result[i] != "" ? result[i] : null; i++;*/
+			//media_label = result[i] != "" ? result[i] : null; i++;
 		}
 	}
 	
-	public class TOSECInfo : Object {
+	public class NoIntro : Object {
 		public string title { construct set; get; }
-		public string? version { construct set; get; }
-		public string? demo { construct set; get; }
-		public string date { construct set; get; }
-		public string publisher { construct set; get; }
-		public string? system { construct set; get; }
-		public string? video { construct set; get; }
-		public string[] countries { construct set; get; default = {}; }
-		public string[] languages { construct set; get; default = {}; }
-		public string? copyright { construct set; get; }
-		public string? development { construct set; get; }
-		public string? media_type { construct set; get; }
-		public string? media_label { construct set; get; }
-		public string? dump_info_flags { construct set; get; }
-		public string? more_info { construct set; get; }
+		
+		public
+		NoIntro (Game game) throws Error {
+			var nointro_error = new Error (Quark.from_string ("nointro-name-parsing"), 1, "The name don't uses the No-Intro conventions.");
+			var regex_error = new Error (Quark.from_string ("regex-scheme"), 1, "The programmer can't do regex, blame him.");
+			
+			Regex regex;
+			var result = new string[0];
+			try {
+				regex = new Regex ("^\"([^\\(\\)\\[\\]]+) .*?(\\(?[^\\[\\]]*\\)?)(\\[?[^\\(\\)]*\\]?)\"");
+				result = regex.split(game.name);
+			}
+			catch (RegexError e) {
+				throw regex_error;
+			}
+			
+			if (result.length < 2) throw nointro_error;
+			
+			title = result[1];
+		}
 	}
 	
 	public class Rom : Object {
