@@ -66,7 +66,8 @@ class BadnikApplication(Gtk.Application):
 		                         { 'name': 'fullscreen', 'callback': self.on_fullscreen, 'accel': 'F11' },
 		                         { 'name': 'view-as', 'callback': self.on_view_as, 'create_hook': self._view_as_create_hook,
 		                           'parameter_type': 's', 'state': self.settings.get_value('view-as') },
-		                         { 'name': 'add-games', 'callback': self.on_add_games }
+		                         { 'name': 'add-games', 'callback': self.on_add_games },
+		                         { 'name': 'download-metadata', 'callback': self.on_download_metadata, 'accel': '<Primary>m' }
 		                       ]
 		self._add_actions()
 		
@@ -151,6 +152,10 @@ class BadnikApplication(Gtk.Application):
 	
 	def on_add_games(self, action, data):
 		print("add games")
+	
+	def on_download_metadata(self, action, data):
+		if (self.focused_game):
+			self.gamesdb.download_game_metadata(self.focused_game)
 	
 	def _view_as_create_hook(self, action):
 		def _changed_view_as(settings, setting):
