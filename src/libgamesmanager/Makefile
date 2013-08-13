@@ -21,7 +21,7 @@ GI_REPOSITORY = $(GIR_NAME)-$(GIR_VERSION).gir
 GI_TYPELIB    = $(GIR_NAME)-$(GIR_VERSION).typelib
 
 VALAC_OUTPUT = $(SHARED_OBJECT) $(GI_REPOSITORY) $(GIR_NAME).vapi
-VALA_PKG = --pkg=gio-unix-2.0 --pkg=gtk+-3.0 --pkg=gdk-pixbuf-2.0 --pkg=libgda-5.0 --pkg=libxml-2.0
+VALA_PKG = --pkg=gio-unix-2.0 --pkg=gtk+-3.0 --pkg=gdk-pixbuf-2.0 --pkg=libgda-5.0 --pkg=libxml-2.0 --pkg=libsoup-2.4 --pkg=pango
 VALA_C_OPTION = -X -fPIC -X -shared
 VALA_OPTIONS = --thread
 VAPI_DIR = --vapidir=.

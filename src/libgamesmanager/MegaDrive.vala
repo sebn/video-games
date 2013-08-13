@@ -150,11 +150,13 @@ namespace GamesManager {
 			
 			var glrmame_info = document.search_game(file);
 			
+			string[] countries = {};
+			
 			try {
 				var tosec_info = glrmame_info.query_tosec_info ();
 				info.title = tosec_info.title;
 				info.developer = tosec_info.publisher;
-				
+				countries = tosec_info.countries;
 				try {
 					info.released = header.query_release_date ();
 				}
@@ -165,7 +167,41 @@ namespace GamesManager {
 			catch (Error e) {
 				info.title = file.get_basename();
 			}
+			
 			info.icon = "game-system-megadrive-jp";
+			
+			
+			var available_countries = new string[0];
+			
+			var enumerator = File.new_for_path (@"$(library.covers_dir)/$(reference)").enumerate_children (FileAttribute.STANDARD_NAME, 0);
+			FileInfo file_info;
+			while ((file_info = enumerator.next_file ()) != null) {
+				try {
+					var regex = new Regex (@"$(info.title)-([A-Z]{2}).jpg");
+					var result = regex.split (file_info.get_name ());
+					if (result.length > 1) available_countries += result [1];
+				}
+				catch (RegexError e) { }
+			}
+			foreach (string s in available_countries) stdout.printf ("available_countries: %s\n", s);
+			
+			// If a country is defined for the game, use the cover of this country.
+			if (countries.length == 1) {
+				info.cover = @"$(library.covers_dir)/$(reference)/$(info.title)-$(countries[0]).jpg";
+			}
+			
+			// If no country is defined for the game, use the local country.
+			if (info.cover == null || ! File.new_for_path (info.cover).query_exists ()) {
+				var local_country = Pango.Language.get_default ().to_string ().split ("-")[1].up ();
+				info.cover = @"$(library.covers_dir)/$(reference)/$(info.title)-$(local_country).jpg";
+			}
+			
+			// If the local country don't haves a cover, guess its world region (JA, EU or US) and use it.
+			
+			// If there is no cover still, use a the first one available.
+			if ((info.cover == null || ! File.new_for_path (info.cover).query_exists ()) && available_countries.length > 0) {
+				info.cover = @"$(library.covers_dir)/$(reference)/$(info.title)-$(available_countries[0]).jpg";
+			}
 			
 			return info;
 		}
@@ -221,7 +257,84 @@ namespace GamesManager {
 		
 		public override GameInfo
 		download_game_metadata (Library library, int game_id) {
-			return get_game_info (library, game_id);
+			var info = get_game_info (library, game_id);
+			
+			var cover_dir = File.new_for_path (@"$(library.covers_dir)/$(reference)");
+			if (!cover_dir.query_exists ()) cover_dir.make_directory_with_parents ();
+			
+			stdout.printf("try to get covers uris\n");
+			foreach (string uri in Guardiana.get_cover_uris (info.title)) {
+				stdout.printf("try to get country from %s\n", uri);
+				var country = Guardiana.query_country_for_cover_uri (uri);
+				
+				var file = cover_dir.get_child (@"$(info.title)-$(country).jpg");
+				
+				if (!file.query_exists ()) {
+					try {
+						stdout.printf("try to download %s\n", uri);
+						File.new_for_uri (uri).copy (file, FileCopyFlags.NONE);
+					stdout.printf("just downloaded %s\n", uri);
+					}
+					catch (Error e) {
+						stderr.printf ("Error: can't copy `%s' in `%s'.\n", uri, file.get_path ());
+					}
+				}
+			}
+			
+			return info;
+		}
+	}
+	
+	public class Guardiana : Object {
+		public const string[] flags = {"error", "JP", "EU", "US", "CN", "BR", "pirate", "KR", "AU", "FR", "BE", "ES", "GB", "IT", "PT", "SE", "CA", "LU", "unknown", "not-understood"};
+		
+		public static string[]
+		get_cover_uris (string title) {
+			var default_guardiana_uri = @"http://www.guardiana.net/MDG-Database/Mega Drive/$(title)/";
+			
+			var session = new Soup.Session ();
+			var message = new Soup.Message ("GET", default_guardiana_uri);
+			
+			session.send_message (message);
+			
+			var page = (string) message.response_body.data;
+			
+			string[] covers = {};
+			try {
+				var cover_re = "src=\"(http://media[0-9]*.sega-database.com//front//[0-9]+/[0-9]+/[0-9]+\\.jpg)\"";
+				var regex = new Regex (cover_re);
+				var result = regex.split(page);
+				for (int i = 1 ; i < result.length ; i+=2) covers += result[i];
+			}
+			catch (RegexError e) { }
+			
+			return covers;
+		}
+		
+		public static string
+		query_country_for_cover_uri (string uri) {
+			try {
+				var country_re = "/([0-9]+)/[0-9]+\\.jpg";
+				var regex = new Regex (country_re);
+				var result = regex.split(uri);
+				stdout.printf("lal\n");
+				if (result.length < 2)
+					return flags[0];
+				stdout.printf("lel\n");
+				var country_index = int.parse(result[1]);
+				stdout.printf("lil %i %i\n", country_index, flags.length);
+				if (country_index < flags.length) {
+					stdout.printf("lol %i\n", country_index);
+					return flags[country_index];
+				}
+				else {
+					stdout.printf("lul\n");
+					return flags[0];
+				}
+			}
+			catch (RegexError e) {
+				return flags[0];
+			}
 		}
 	}
 }

@@ -260,36 +260,31 @@ namespace GamesManager.Glrmame {
 			
 			var system_ex = """(?:\(([^()]*?)\))?"""; // May be too greedy because it is too generic.
 			var video_ex = """(?:\((CGA|EGA|HGC|MCGA|MDA|NTSC|NTSC-PAL|PAL|PAL-60|PAL-NTSC|SVGA|VGA|XGA)\))?""";
-			var country_ex = """(?:\(([A-Z]{2}(?:-[A-Z]{2})?)\))?""";
-			var language_ex = """(?:\(((?:[a-z]{2}(?:-[a-z]{2})?)|M[0-9])\))?""";
+			var countries_ex = """(?:\(([A-Z]{2}(?:-[A-Z]{2})?)\))?""";
+			var languages_ex = """(?:\(((?:[a-z]{2}(?:-[a-z]{2})?)|M[0-9])\))?""";
 			var copyright_ex = """(?:\((CW|CW-R|FW|GW|GW-R|LW|PD|SW|SW-R)\))?""";
 			var development_ex = """(?:\((alpha|beta|preview|pre-release|proto)\))?""";
 			var media_type_ex = """(?:\(((?:Disc|Disk|File|Part|Side|Tape) [^()]*?)\))?""";
 			var media_label_ex = """(?:\(([^()]*?)\))?"""; // May be too greedy because it is too generic.
 			
 			try {
-				regex = new Regex ("^" + video_ex + country_ex + language_ex + copyright_ex + development_ex + media_type_ex + "(.*?$)");
+				regex = new Regex ("^" + video_ex + countries_ex + languages_ex + copyright_ex + development_ex + media_type_ex + "(.*?$)");
 				result = regex.split(game_info_rest);
 			}
 			catch (RegexError e) {
 				throw regex_error;
 			}
-			/*
+			
 			uint i = 1;
 			//info.system = result[i] != "" ? result[i] : null; i++;
 			info.video = result[i] != "" ? result[i] : null; i++;
-			info.country = result[i] != "" ? result[i] : null; i++;
-			info.language = result[i] != "" ? result[i] : null; i++;
+			info.countries = result[i] != null && result[i] != "" ? result[i].split("-") : new string[0]; i++;/*
+			info.languages = result[i] != null && result[i] != "" ? result[i].split("-") : new string[0]; i++;
 			info.copyright = result[i] != "" ? result[i] : null; i++;
 			info.development = result[i] != "" ? result[i] : null; i++;
-			info.media_type = result[i] != "" ? result[i] : null; i++;
+			info.media_type = result[i] != "" ? result[i] : null; i++;*/
 			//info.media_label = result[i] != "" ? result[i] : null; i++;
 			
-			stdout.printf ("Parsing |%s||%s||%s|\n", title_info, game_info, rom_info);
-			foreach (string s in result) {
-				stdout.printf ("result: %s\n", s);
-			}
-			*/
 			return info;
 		}
 	}
@@ -302,8 +297,8 @@ namespace GamesManager.Glrmame {
 		public string publisher { construct set; get; }
 		public string? system { construct set; get; }
 		public string? video { construct set; get; }
-		public string? country { construct set; get; }
-		public string? language { construct set; get; }
+		public string[] countries { construct set; get; default = {}; }
+		public string[] languages { construct set; get; default = {}; }
 		public string? copyright { construct set; get; }
 		public string? development { construct set; get; }
 		public string? media_type { construct set; get; }

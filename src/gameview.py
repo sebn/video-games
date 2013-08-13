@@ -132,13 +132,15 @@ class MainGameView(Gtk.Box):
 		self.app.play_game()
 	
 	def on_game_updated(self, application, id):
-		
 		# Get the relative entry in the model
 		iter = None
+		
+		#Gdk.threads_enter ()
 		for game in self.model:
 			if int(game[0]) == int(id):
 				iter = game.iter
 				break
+		#Gdk.threads_leave ()
 		
 		# It is extremly important to use Gdk.threads_enter() and
 		# Gdk.threads_leave() : it allows to synchronise the Gdk (Gtk)
@@ -150,7 +152,7 @@ class MainGameView(Gtk.Box):
 			Gdk.threads_enter()
 			self.model.set_value(iter, 2, info.get_property("title"))
 			self.model.set_value(iter, 3, info.get_property("developer"))
-			#self.model.set_value(iter, 4, info.get_pixbuf(128, 0))
+			self.model.set_value(iter, 4, info.get_pixbuf(128, 0))
 			self.model.set_value(iter, 5, int(time.time()))
 			Gdk.threads_leave()
 		else:
@@ -175,6 +177,10 @@ class MainGameView(Gtk.Box):
 	def show_game(self, id):
 		id = int(id)
 		self.app.focus_game(id)
+		#try:
+		#	Thread(target=self.app.gamesdb.download_game_metadata, args=(self.app.focused_game, ),).start()
+		#except:
+		#	print("Can't download metadata.")
 		
 		# Show
 		info = self.app.gamesdb.get_game_info(id)
@@ -401,6 +407,8 @@ class GameView(Gtk.ScrolledWindow):
 	def _set_informations_from_game(self):
 		info = self.app.gamesdb.get_game_info(self.app.focused_game)
 		
+		#Gdk.threads_enter ()
+		
 		# Set the title
 		title = info.get_property("title") if info.get_property("title") else "Unknown title"
 		self.title.set_markup("<span size='large'>" + title + "</span>")
@@ -507,3 +515,5 @@ class GameView(Gtk.ScrolledWindow):
 		else:
 			self._description.hide()
 			self.description.hide()
+		
+		#Gdk.threads_leave ()

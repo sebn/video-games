@@ -3,6 +3,7 @@ namespace GamesManager {
 		public string provider { set; get; default = "SQLite"; }
 		public string db_name { construct; get; }
 		public string db_dir { construct; get; }
+		public string covers_dir { construct; get; }
 		
 		public bool stop_searches { set; get; default = false; }
 		
@@ -63,6 +64,8 @@ namespace GamesManager {
 		}
 		
 		construct {
+			covers_dir = File.new_for_path (db_dir).get_child ("covers").get_path ();
+			
 			systems = new HashTable<string, System> (str_hash, str_equal);
 			
 			var cnn = open_connection();
@@ -155,9 +158,8 @@ namespace GamesManager {
 				return reference;
 			}
 			catch (Error e) {
-				stderr.printf("Error: can't get the system reference for the game identifier %i.\n", game_id);
 				cnn.close();
-				throw e;
+				throw new Error (Quark.from_string ("bad-game-id"), 1, "Can't get the system reference for the game identifier %i.\n", game_id);;
 			}
 		}
 		
@@ -385,6 +387,7 @@ namespace GamesManager {
 					try {
 						var game_id = get_game_id_for_reference(system, reference);
 						add_uri_for_game(game_id, uri);
+						download_game_metadata (game_id);
 						game_updated(game_id);
 					}
 					catch (Error e) {
@@ -483,10 +486,11 @@ namespace GamesManager {
 		download_game_metadata (int game_id) throws Error {
 			var system_ref = get_system_reference(game_id);
 			var system = systems.get(system_ref);
-			var metadata = system.download_game_metadata(this, game_id);
+			stdout.printf("try to download metadata for game %i on system %s\n", game_id, system_ref);
+			var metadata = system.download_game_metadata(this, game_id);/*
 			var cnn = open_connection();
 			cnn.execute_non_select_command (@"UPDATE games SET developer = \"$(metadata.developer)\",released = $(metadata.released), genre = \"$(metadata.genre)\", description = \"$(metadata.description)\", rank = $(metadata.rank) WHERE id = $(game_id)");
-			cnn.close();
+			cnn.close();*/
 			game_updated(game_id);
 		}
 	}

@@ -4,7 +4,7 @@ namespace GamesManager {
 		public string title { get; set; }
 		public string developer { get; set; }
 		public string icon { get; set; default = null; } // The icon name
-		public string cover { get; set; } // The path to the cover
+		public string cover { get; set; default = null; } // The path to the cover
 		public string released { get; set; }
 		public System system { get; set; }
 		public string genre { get; set; }
