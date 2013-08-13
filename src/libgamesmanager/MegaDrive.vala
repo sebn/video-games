@@ -112,7 +112,8 @@ namespace GamesManager {
 			"gens.desktop", 
 			"dribble-gens.desktop" };
 		
-		private Glrmame.Document document;
+		private Glrmame.Document nointro_doc;
+		private Glrmame.Document tosec_doc;
 		
 		public MegaDrive () {
 			Object (reference: "megadrive", game_search_type: GameSearchType.STANDARD);
@@ -122,10 +123,15 @@ namespace GamesManager {
 			var clrmamepro_dir = Glrmame.get_clrmamepro_dir ();
 			
 			if (clrmamepro_dir != null) {
-				var file = File.new_for_path (clrmamepro_dir);
-				file = file.get_child (@"$(reference).dat");
-				if (file.query_exists ())
-					document = new Glrmame.Document(file.get_path ());
+				var dir = File.new_for_path (clrmamepro_dir);
+				
+				var nointro_file = dir.get_child (@"$(reference)-nointro.dat");
+				if (nointro_file.query_exists ())
+					nointro_doc = new Glrmame.Document(nointro_file.get_path ());
+				
+				var tosec_file = dir.get_child (@"$(reference)-tosec.dat");
+				if (tosec_file.query_exists ())
+					tosec_doc = new Glrmame.Document(tosec_file.get_path ());
 			}
 		}
 		
@@ -148,29 +154,45 @@ namespace GamesManager {
 			
 			var header = new MegaDriveROMHeader (file.get_path ());
 			
-			var glrmame_info = document.search_game(file);
+			Glrmame.TOSEC? tosec_info = null;
+			Glrmame.NoIntro? nointro_info = null;
+			
+			try {
+				var game = tosec_doc.search_game(file);
+				if (game != null) tosec_info = new Glrmame.TOSEC (game);
+			}
+			catch (Error e) { }
+			
+			try {
+				var game = nointro_doc.search_game(file);
+				if (game != null) nointro_info = new Glrmame.NoIntro (game);
+			}
+			catch (Error e) { }
 			
 			string[] countries = {};
 			
 			try {
-				var tosec_info = glrmame_info.query_tosec_info ();
+				info.released = header.query_release_date ();
+			}
+			catch (Error e) { }
+			
+			// Try to get info from TOSEC.
+			if (tosec_info != null) {
 				info.title = tosec_info.title;
 				info.developer = tosec_info.publisher;
+				if (info.released == null) info.released = tosec_info.date;
+				
 				countries = tosec_info.countries;
-				try {
-					info.released = header.query_release_date ();
-				}
-				catch (Error e) {
-					if (tosec_info.date != null) info.released = tosec_info.date;
-				}
 			}
-			catch (Error e) {
-				info.title = file.get_basename();
+			
+			// Try to get info from No-Intro.
+			if (nointro_info != null) {
+				if (info.title == null) info.title = nointro_info.title;
 			}
 			
 			info.icon = "game-system-megadrive-jp";
 			
-			
+			// Get the available countries for the game.
 			var available_countries = new string[0];
 			
 			var enumerator = File.new_for_path (@"$(library.covers_dir)/$(reference)").enumerate_children (FileAttribute.STANDARD_NAME, 0);
@@ -244,15 +266,8 @@ namespace GamesManager {
 		public override string
 		get_game_reference_for_uri (string uri) {
 			var file = File.new_for_uri (uri);
-			var glrmame_info = document.search_game(file);
-			try {
-				var tosec_info = glrmame_info.query_tosec_info ();
-				
-				return tosec_info.title;
-			}
-			catch (Error e) {
-				return file.get_basename ();
-			}
+			var header = new MegaDriveROMHeader (file.get_path ());
+			return header.international_name;
 		}
 		
 		public override GameInfo
@@ -290,10 +305,10 @@ namespace GamesManager {
 		
 		public static string[]
 		get_cover_uris (string title) {
-			var default_guardiana_uri = @"http://www.guardiana.net/MDG-Database/Mega Drive/$(title)/";
+			var guardiana_uri = @"http://www.guardiana.net/MDG-Database/Mega Drive/$(title)/";
 			
 			var session = new Soup.Session ();
-			var message = new Soup.Message ("GET", default_guardiana_uri);
+			var message = new Soup.Message ("GET", guardiana_uri);
 			
 			session.send_message (message);
 			
