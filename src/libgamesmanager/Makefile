@@ -34,7 +34,8 @@ DEVICES_ICONS = game-system-megadrive-jp.png \
 INSTALLED_DEVICE_ICONS = $(DEVICES_ICONS:%=$(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%)
 
 CLRMAMEPRO_DOCS = doom.dat \
-                  megadrive.dat \
+                  megadrive-nointro.dat \
+                  megadrive-tosec.dat \
                   snes.dat
 
 INSTALLED_CLRMAMEPRO_DOCS = $(CLRMAMEPRO_DOCS:%=$(prefix)/share/$(LIB_NAME)/clrmamepro/%)
