@@ -16,9 +16,7 @@ Badnik 0.2
 
 Badnik 0.3
 	GUI:
-		Move the window with "alt+drag"
-		Move window by dragging the toolbar
-		Move to GNOME 3.10:
+		Switch to GNOME 3.10:
 			Move to the undecorated design (toolbar with window control)
 		Add the fulscreen action (or remove it)
 	
@@ -28,9 +26,6 @@ Badnik 0.3
 		Add some basic command line options (help, verbose...)
 		Add internationalization
 		Solve the warnings raised by Gda.Connection.open_from_string
-	
-	Get a proper identity:
-		Get a meaningful name
 
 Badnik 0.4
 	GUI:

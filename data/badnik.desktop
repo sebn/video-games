@@ -1,10 +1,10 @@
 [Desktop Entry]
 Version=0.3.0
-Name=Badnik
-GenericName=Game launcher
+Name=Video games
+Name[fr_FR]=Jeux vidéo
+Name[es_ES]=Videojuegos
 Categories=Game;
 Exec=badnik
 Icon=badnik
 Terminal=false
 Type=Application
-Name[fr_FR]=Badnik

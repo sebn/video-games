@@ -35,7 +35,7 @@ class BadnikApplication(Gtk.Application):
 		Gdk.threads_init()
 		
 		self.simplename = "badnik"
-		self.fullname = "Badnik"
+		self.fullname = "Video games"
 		
 		self.datadir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
 		self.savedatadir = BaseDirectory.save_data_path(self.simplename)

@@ -44,6 +44,8 @@ class MainGameView(Gtk.Box):
 		self.gameview = None
 		
 		self.toolbar = Gd.MainToolbar()
+		#self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+		self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR);
 		self.toolbar.set_show_modes(False)
 		self.toolbar.show_all()
 		
