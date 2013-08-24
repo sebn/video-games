@@ -148,44 +148,54 @@ namespace GamesManager.Glrmame {
 		
 		public string[]
 		get_words () {
-			stdout.printf ("Retrieving words of `%s`.\n", path);
-			var file = File.new_for_path (path);
-			var info = file.query_info("*", FileQueryInfoFlags.NONE);
-			var data = new uint8[info.get_size()];
-			file.read().read(data);
-			
-			var regex = new Regex ("""((?:[^ \n\r\t"]|"[^"]*")+)""");
-			
-			return regex.split((string) data);
+			try {
+				stdout.printf ("Retrieving words of `%s`.\n", path);
+				var file = File.new_for_path (path);
+				var info = file.query_info(FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE);
+				var data = new uint8[info.get_size()];
+				file.read().read(data);
+				
+				var regex = new Regex ("""((?:[^ \n\r\t"]|"[^"]*")+)""");
+				
+				return regex.split((string) data);
+			}
+			catch (Error e) {
+				return {};
+			}
 		}
 		
 		public Game?
 		search_game (File file) {
-			var info = file.query_info("*", FileQueryInfoFlags.NONE);
-			
-			var size = info.get_size();
-			var data = new uchar[size];
-			file.read().read(data);
-			
-			var md5 = Checksum.compute_for_data (ChecksumType.MD5, data);
-			var sha1 = Checksum.compute_for_data (ChecksumType.SHA1, data);
-			
-			stdout.printf ("Searching `%s`.\n", file.get_path());
-			
-			foreach (Game game in games) {
-				if (game.rom != null && game.rom.size != null && int64.parse (game.rom.size) == size) {
-					if (game.rom.md5 != null && game.rom.md5.down() == md5) {
-						stdout.printf ("Found `%s` !\n", file.get_path());
-						return game;
-					}
-					if (game.rom.sha1 != null && game.rom.sha1.down() == sha1) {
-						stdout.printf ("Found `%s` !\n", file.get_path());
-						return game;
+			try {
+				var info = file.query_info(FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE);
+				
+				var size = info.get_size();
+				var data = new uchar[size];
+				file.read().read(data);
+				
+				var md5 = Checksum.compute_for_data (ChecksumType.MD5, data);
+				var sha1 = Checksum.compute_for_data (ChecksumType.SHA1, data);
+				
+				stdout.printf ("Searching `%s`.\n", file.get_path());
+				
+				foreach (Game game in games) {
+					if (game.rom != null && game.rom.size != null && int64.parse (game.rom.size) == size) {
+						if (game.rom.md5 != null && game.rom.md5.down() == md5) {
+							stdout.printf ("Found `%s` !\n", file.get_path());
+							return game;
+						}
+						if (game.rom.sha1 != null && game.rom.sha1.down() == sha1) {
+							stdout.printf ("Found `%s` !\n", file.get_path());
+							return game;
+						}
 					}
 				}
+				
+				return null;
 			}
-			
-			return null;
+			catch (Error e) {
+				return null;
+			}
 		}
 	}
 	

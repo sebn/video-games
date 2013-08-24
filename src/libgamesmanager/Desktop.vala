@@ -20,7 +20,7 @@ namespace GamesManager {
 		}
 		
 		public override GameInfo
-		get_game_info (Library library, int game_id) {
+		get_game_info (Library library, int game_id) throws Error {
 			var info = library.get_default_game_info(game_id);
 			
 			var uri = library.get_game_uri(game_id);
@@ -34,7 +34,7 @@ namespace GamesManager {
 		}
 		
 		public override string
-		get_game_exec (Library library, int game_id) {
+		get_game_exec (Library library, int game_id) throws Error {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			var desktop_app_info = new DesktopAppInfo.from_filename(file.get_path());
@@ -43,7 +43,7 @@ namespace GamesManager {
 		}
 		
 		public override bool
-		query_is_game_available (Library library, int game_id) {
+		query_is_game_available (Library library, int game_id) throws Error {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			if (file.query_exists()) {
@@ -55,7 +55,7 @@ namespace GamesManager {
 		}
 		/*
 		public override bool
-		query_is_a_game (Library library, string uri) {
+		query_is_a_game (string uri) {
 			
 		}*/
 		
@@ -65,9 +65,9 @@ namespace GamesManager {
 			return file.get_basename().split(".")[0];
 		}
 		/*
-		public override GameInfo
+		public override GameMetadataInfo
 		download_game_metadata (Library library, int game_id) {
-			
+			return new GameMetadataInfo ();
 		}*/
 	}
 }

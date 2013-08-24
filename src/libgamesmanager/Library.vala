@@ -370,7 +370,7 @@ namespace GamesManager {
 		
 		private void
 		add_new_game (System system, string uri) {
-			if (system.query_is_a_game(this, uri)) {
+			if (system.query_is_a_game(uri)) {
 				var reference = system.get_game_reference_for_uri(uri);
 				if (!query_game_exists_for_reference(system, reference)) {
 					var cnn = open_connection();
@@ -487,7 +487,30 @@ namespace GamesManager {
 			var system_ref = get_system_reference(game_id);
 			var system = systems.get(system_ref);
 			stdout.printf("try to download metadata for game %i on system %s\n", game_id, system_ref);
-			var metadata = system.download_game_metadata(this, game_id);/*
+			var metadata = system.download_game_metadata(this, game_id);
+			
+			/* Download covers */
+			
+			// Create the cover directory
+			var cover_dir = File.new_for_path (@"$(covers_dir)/$(system_ref)");
+			if (!cover_dir.query_exists ()) cover_dir.make_directory_with_parents ();
+			
+			foreach (CoverInfo cover in metadata.covers) {
+				var file = cover_dir.get_child (cover.name);
+				
+				if (! file.query_exists ()) {
+					try {
+						stdout.printf("try to download %s\n", cover.uri);
+						File.new_for_uri (cover.uri).copy (file, FileCopyFlags.NONE);
+						stdout.printf("just downloaded %s\n", cover.uri);
+					}
+					catch (Error e) {
+						stderr.printf ("Error: can't copy `%s' in `%s'.\n", cover.uri, file.get_path ());
+					}
+				}
+			}
+			
+			/*
 			var cnn = open_connection();
 			cnn.execute_non_select_command (@"UPDATE games SET developer = \"$(metadata.developer)\",released = $(metadata.released), genre = \"$(metadata.genre)\", description = \"$(metadata.description)\", rank = $(metadata.rank) WHERE id = $(game_id)");
 			cnn.close();*/

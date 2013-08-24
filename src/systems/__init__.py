@@ -24,5 +24,5 @@ class Doom(GamesManager.Doom):
 		GamesManager.Doom.__init__(self, reference = "doom")
 
 class MegaDrive(GamesManager.MegaDrive):
-	def __init__(self, gamesdb):
+	def __init__(self):
 		GamesManager.MegaDrive.__init__(self, reference = "megadrive")

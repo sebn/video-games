@@ -30,10 +30,11 @@ from gi.repository import GamesManager
 from metadata import mobygames
 
 class Desktop(GamesManager.Desktop):
-	def __init__(self):
+	def __init__(self, library):
 		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
+		self.library = library
 	
-	def do_query_is_a_game(self, library, uri):
+	def do_query_is_a_game(self, uri):
 		def is_a_game_category(category):
 			"""Return True if the given category can be considered as a game related category, False otherwise"""
 			return category == "Game"
@@ -51,7 +52,7 @@ class Desktop(GamesManager.Desktop):
 		
 		def is_black_listed(file):
 			file_name = path.basename(file)
-			for black_listed in library.get_application_black_list():
+			for black_listed in self.library.get_application_black_list():
 				if file_name == black_listed:
 					return False
 		

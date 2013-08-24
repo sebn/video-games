@@ -33,7 +33,7 @@ class BadnikLibrary(GamesManager.Library):
 		self.app = app
 		self.path = os.path.join(save_data_dir, "games.db")
 		
-		self.add_system(desktop.Desktop())
+		self.add_system(desktop.Desktop(self))
 		self.add_system(systems.Doom())
-		self.add_system(systems.MegaDrive(self))
+		self.add_system(systems.MegaDrive())
 

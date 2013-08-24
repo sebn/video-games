@@ -58,7 +58,7 @@ namespace GamesManager {
 		}
 		
 		public override GameInfo
-		get_game_info (Library library, int game_id) {
+		get_game_info (Library library, int game_id) throws Error {
 			var info = library.get_default_game_info (game_id);
 			
 			var uri = library.get_game_uri(game_id);
@@ -81,21 +81,21 @@ namespace GamesManager {
 		}
 		
 		public override string
-		get_game_exec (Library library, int game_id) {
+		get_game_exec (Library library, int game_id) throws Error {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			return @"prboom -vidmode gl -nowindow -iwad $(file.get_path())";
 		}
 		
 		public override bool
-		query_is_game_available (Library library, int game_id) {
+		query_is_game_available (Library library, int game_id) throws Error {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
-			return file.query_exists() && (query_is_a_game (library, library.get_game_uri(game_id)));
+			return file.query_exists() && (query_is_a_game (library.get_game_uri(game_id)));
 		}
 		
 		public override bool
-		query_is_a_game (Library library, string uri) {
+		query_is_a_game (string uri) {
 			var file = File.new_for_uri (uri);
 			var splitted_name = file.get_basename().split(".");
 			var extension = splitted_name[splitted_name.length - 1].down();
@@ -126,9 +126,9 @@ namespace GamesManager {
 			}
 		}
 		
-		public override GameInfo
+		public override GameMetadataInfo
 		download_game_metadata (Library library, int game_id) {
-			return get_game_info (library, game_id);
+			return new GameMetadataInfo ();
 		}
 	}
 }

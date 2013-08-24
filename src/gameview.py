@@ -101,18 +101,34 @@ class MainGameView(Gtk.Box):
 				info = GamesManager.GameInfo()
 			title = info.get_property("title")
 			developer = info.get_property("developer")
-			icon = info.get_pixbuf(128, 0)
+			icon = info.get_pixbuf(self.get_requiered_pixbuf_size (), 0)
 			Gdk.threads_enter()
 			self.view.get_model().append([str(id), "", title, developer, icon, int(time.time()), False])
 			Gdk.threads_leave()
 	
 	def set_view(self, settings=None, setting=None):
 		value = self.app.settings.get_value('view-as').get_string()
+		
 		if value == 'icon':
 			self.view.set_view_type(0)
 		elif value == 'list':
 			self.view.set_view_type(1)
 		
+		size = self.get_requiered_pixbuf_size ()
+		#Gdk.threads_enter()
+		for entry in self.model:
+			info = self.app.gamesdb.get_game_info(int(entry[0]))
+			self.model.set_value(entry.iter, 4, info.get_pixbuf(size, 0))
+		#Gdk.threads_leave()
+	
+	def get_requiered_pixbuf_size (self):
+		value = self.app.settings.get_value('view-as').get_string()
+		if value == 'icon':
+			return 128
+		elif value == 'list':
+			return 48
+		else:
+			return 128
 	
 	def populate(self):
 		for id in self.app.gamesdb.get_games_id():
@@ -154,7 +170,7 @@ class MainGameView(Gtk.Box):
 			Gdk.threads_enter()
 			self.model.set_value(iter, 2, info.get_property("title"))
 			self.model.set_value(iter, 3, info.get_property("developer"))
-			self.model.set_value(iter, 4, info.get_pixbuf(128, 0))
+			self.model.set_value(iter, 4, info.get_pixbuf(self.get_requiered_pixbuf_size (), 0))
 			self.model.set_value(iter, 5, int(time.time()))
 			Gdk.threads_leave()
 		else:

@@ -10,6 +10,7 @@ GIR_VERSION = 0.1
 
 SOURCES = Library.vala \
           GameInfo.vala \
+          GameMetadataInfo.vala \
           Glrmame.vala \
           System.vala \
           Desktop.vala \
@@ -21,7 +22,15 @@ GI_REPOSITORY = $(GIR_NAME)-$(GIR_VERSION).gir
 GI_TYPELIB    = $(GIR_NAME)-$(GIR_VERSION).typelib
 
 VALAC_OUTPUT = $(SHARED_OBJECT) $(GI_REPOSITORY) $(GIR_NAME).vapi
-VALA_PKG = --pkg=gio-unix-2.0 --pkg=gtk+-3.0 --pkg=gdk-pixbuf-2.0 --pkg=libgda-5.0 --pkg=libxml-2.0 --pkg=libsoup-2.4 --pkg=pango
+VALA_PKG = --pkg=gio-unix-2.0 \
+           --pkg=gtk+-3.0 \
+           --pkg=gdk-pixbuf-2.0 \
+           --pkg=libgda-5.0 \
+           --pkg=libxml-2.0 \
+           --pkg=libsoup-2.4 \
+           --pkg=pango \
+           --pkg=packagekit-glib2
+
 VALA_C_OPTION = -X -fPIC -X -shared
 VALA_OPTIONS = --thread
 VAPI_DIR = --vapidir=.
@@ -29,7 +38,7 @@ VAPI_DIR = --vapidir=.
 ICON_THEME = hicolor
 
 DEVICES_ICONS = media-mega-drive-cartridge-eu.png \
-                game-system-superfamicom.png
+#                game-system-superfamicom.png
 
 INSTALLED_DEVICE_ICONS = $(DEVICES_ICONS:%=$(prefix)/share/icons/$(ICON_THEME)/256x256/devices/%)
 

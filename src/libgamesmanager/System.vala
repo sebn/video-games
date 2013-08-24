@@ -23,22 +23,22 @@ namespace GamesManager {
 		/**
 		 * Return a GameInfo object containing as much informations as possible about the game.
 		 */
-		public abstract GameInfo get_game_info (Library library, int game_id);
+		public abstract GameInfo get_game_info (Library library, int game_id) throws Error;
 		
 		/**
 		 * Return a string containing the command line to start the game.
 		 */
-		public abstract string get_game_exec (Library library, int game_id);
+		public abstract string get_game_exec (Library library, int game_id) throws Error;
 		
 		/**
 		 * Check if the game can actually be played (if its launcher is installed, if its files are actually present...).
 		 */
-		public abstract bool query_is_game_available (Library library, int game_id);
+		public abstract bool query_is_game_available (Library library, int game_id) throws Error;
 		
 		/**
 		 * Check if the given URI actually represents a game for this system.
 		 */
-		public abstract bool query_is_a_game (Library library, string uri);
+		public abstract bool query_is_a_game (string uri);
 		
 		/**
 		 * Return an unique reference for this game on this system.
@@ -48,7 +48,7 @@ namespace GamesManager {
 		/**
 		 * Return an unique reference for this game on this system.
 		 */
-		public abstract GameInfo download_game_metadata (Library library, int game_id);
+		public abstract GameMetadataInfo download_game_metadata (Library library, int game_id);
 		
 		public static bool
 		query_program_exists (string program) {

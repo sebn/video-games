@@ -75,6 +75,10 @@ namespace GamesManager {
 			
 			data_stream.read (buffer);
 			notes = (string) buffer;
+			
+			var task = new Pk.Task ();
+			
+			//task.install_packages_async ({"dgen"}, null, (p) => { if (p.percentage != -1) {  stdout.printf ("%d%\n", p.percentage); } }, () => { stdout.printf ("Finished to install dgen.\n"); }); 
 		}
 		
 		public bool
@@ -146,7 +150,7 @@ namespace GamesManager {
 		}
 		
 		public override GameInfo
-		get_game_info (Library library, int game_id) {
+		get_game_info (Library library, int game_id) throws Error {
 			var info = library.get_default_game_info (game_id);
 			
 			var uri = library.get_game_uri(game_id);
@@ -192,30 +196,36 @@ namespace GamesManager {
 			
 			info.icon = "media-mega-drive-cartridge-eu";
 			
+			
+			
+			var cover_dir = File.new_for_path (library.covers_dir).get_child (reference);
+			
 			// Get the available countries for the game.
 			var available_countries = new string[0];
 			
-			var enumerator = File.new_for_path (@"$(library.covers_dir)/$(reference)").enumerate_children (FileAttribute.STANDARD_NAME, 0);
-			FileInfo file_info;
-			while ((file_info = enumerator.next_file ()) != null) {
-				try {
-					var regex = new Regex (@"$(info.title)-([A-Z]{2}).jpg");
-					var result = regex.split (file_info.get_name ());
-					if (result.length > 1) available_countries += result [1];
+			try {
+				var enumerator = cover_dir.enumerate_children (FileAttribute.STANDARD_NAME, 0);
+				FileInfo file_info;
+				while ((file_info = enumerator.next_file ()) != null) {
+					try {
+						var regex = new Regex (@"$(info.title)-([A-Z]{2}).jpg");
+						var result = regex.split (file_info.get_name ());
+						if (result.length > 1) available_countries += result [1];
+					}
+					catch (RegexError e) { }
 				}
-				catch (RegexError e) { }
 			}
-			foreach (string s in available_countries) stdout.printf ("available_countries: %s\n", s);
+			catch (Error e) { }
 			
 			// If a country is defined for the game, use the cover of this country.
 			if (countries.length == 1) {
-				info.cover = @"$(library.covers_dir)/$(reference)/$(info.title)-$(countries[0]).jpg";
+				info.cover = cover_dir.get_child (@"$(info.title)-$(countries[0]).jpg").get_path ();
 			}
 			
 			// If no country is defined for the game, use the local country.
 			if (info.cover == null || ! File.new_for_path (info.cover).query_exists ()) {
 				var local_country = Pango.Language.get_default ().to_string ().split ("-")[1].up ();
-				info.cover = @"$(library.covers_dir)/$(reference)/$(info.title)-$(local_country).jpg";
+				info.cover = cover_dir.get_child (@"$(info.title)-$(local_country).jpg").get_path ();
 			}
 			
 			// If the local country don't haves a cover, guess its world region (JA, EU or US) and use it.
@@ -229,7 +239,7 @@ namespace GamesManager {
 		}
 		
 		public override string
-		get_game_exec (Library library, int game_id) {
+		get_game_exec (Library library, int game_id) throws Error {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
 			
@@ -240,14 +250,14 @@ namespace GamesManager {
 		}
 		
 		public override bool
-		query_is_game_available (Library library, int game_id) {
+		query_is_game_available (Library library, int game_id) throws Error {
 			var uri = library.get_game_uri(game_id);
 			var file = File.new_for_uri(uri);
-			return file.query_exists() && (query_is_a_game (library, library.get_game_uri(game_id)));
+			return file.query_exists() && (query_is_a_game (library.get_game_uri(game_id)));
 		}
 		
 		public override bool
-		query_is_a_game (Library library, string uri) {
+		query_is_a_game (string uri) {
 			var file = File.new_for_uri (uri);
 			var splitted_name = file.get_basename().split(".");
 			var extension = splitted_name[splitted_name.length - 1].down();
@@ -270,33 +280,23 @@ namespace GamesManager {
 			return header.international_name;
 		}
 		
-		public override GameInfo
+		public override GameMetadataInfo
 		download_game_metadata (Library library, int game_id) {
 			var info = get_game_info (library, game_id);
 			
-			var cover_dir = File.new_for_path (@"$(library.covers_dir)/$(reference)");
-			if (!cover_dir.query_exists ()) cover_dir.make_directory_with_parents ();
+			CoverInfo[] covers = {};
 			
 			stdout.printf("try to get covers uris\n");
 			foreach (string uri in Guardiana.get_cover_uris (info.title)) {
-				stdout.printf("try to get country from %s\n", uri);
 				var country = Guardiana.query_country_for_cover_uri (uri);
 				
-				var file = cover_dir.get_child (@"$(info.title)-$(country).jpg");
-				
-				if (!file.query_exists ()) {
-					try {
-						stdout.printf("try to download %s\n", uri);
-						File.new_for_uri (uri).copy (file, FileCopyFlags.NONE);
-					stdout.printf("just downloaded %s\n", uri);
-					}
-					catch (Error e) {
-						stderr.printf ("Error: can't copy `%s' in `%s'.\n", uri, file.get_path ());
-					}
-				}
+				covers += new CoverInfo (uri, @"$(info.title)-$(country).jpg");
 			}
 			
-			return info;
+			var metadata = new GameMetadataInfo ();
+			metadata.covers = covers;
+			
+			return metadata;
 		}
 	}
 	
