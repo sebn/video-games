@@ -72,6 +72,7 @@ all:
 install: $(desktop)
 
 $(desktop): $(DESKTOP) $(bin) $(icontheme)
+	mkdir -p $(DESKTOPDIR)
 	cp -f $< $(@D)
 	chmod +x $@
 
@@ -81,6 +82,7 @@ $(bin): $(installedschemas) $(sources) $(tosec)
 	chmod +x $@
 
 $(installedschemas): $(schemainstalldir)/%.gschema.xml: $(schemadir)/%.gschema.xml
+	mkdir -p $(schemainstalldir)
 	cp -fR $< $(@D)
 	glib-compile-schemas $(@D)
 
