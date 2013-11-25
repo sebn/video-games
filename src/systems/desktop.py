@@ -25,13 +25,13 @@ import sqlite3
 import urllib
 
 from gi.repository import Gtk
-from gi.repository import GamesManager
+from gi.repository import Badnik
 
 from metadata import mobygames
 
-class Desktop(GamesManager.Desktop):
+class Desktop(Badnik.Desktop):
 	def __init__(self, library):
-		GamesManager.Desktop.__init__(self, reference = "desktop", game_search_type = GamesManager.GameSearchType.APPLICATIONS)
+		Badnik.Desktop.__init__(self, reference = "desktop", game_search_type = Badnik.GameSearchType.APPLICATIONS)
 		self.library = library
 	
 	def do_query_is_a_game(self, uri):

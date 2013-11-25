@@ -18,7 +18,7 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
-from gi.repository import Gd, GamesManager
+from gi.repository import Gd, Badnik
 import time
 
 from threading import Thread
@@ -98,7 +98,7 @@ class MainGameView(Gtk.Box):
 		if (not self.has_game(id)) and self.app.gamesdb.query_is_game_available(id):
 			info = self.app.gamesdb.get_game_info(id)
 			if not info:
-				info = GamesManager.GameInfo()
+				info = Badnik.GameInfo()
 			title = info.get_property("title")
 			developer = info.get_property("developer")
 			icon = info.get_pixbuf(self.get_requiered_pixbuf_size (), 0)

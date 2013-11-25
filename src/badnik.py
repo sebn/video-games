@@ -163,7 +163,7 @@ class BadnikApplication(Gtk.Application):
 		self.settings.connect('changed::view-as', _changed_view_as)
 	
 	def update_library(self):
-		self.gamesdb.search_new_games(os.path.expanduser("~"))
+		self.gamesdb.search_games()
 	
 	def update_library_async(self):
 		Thread(target=self.update_library, args=(), kwargs={}).start()

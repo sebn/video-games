@@ -20,20 +20,18 @@
 from gi.repository import GObject
 import os.path
 
-from gi.repository import GamesManager
+from gi.repository import Badnik
 
-from systems import desktop
+#from systems import desktop
 import systems
 
-class BadnikLibrary(GamesManager.Library):
+class BadnikLibrary(Badnik.Library):
 	'''A games dedicated database'''
 	def __init__(self, app, save_data_dir):
-		GamesManager.Library.__init__(self, db_name = "games", db_dir = save_data_dir)
+		Badnik.Library.__init__(self, db_name = "games", db_dir = save_data_dir)
 		
 		self.app = app
 		self.path = os.path.join(save_data_dir, "games.db")
 		
-		self.add_system(desktop.Desktop(self))
-		self.add_system(systems.Doom())
-		self.add_system(systems.MegaDrive())
+		self.add_system(Badnik.MegaDrive ())
 
