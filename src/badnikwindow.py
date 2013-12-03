@@ -42,7 +42,14 @@ class BadnikWindow(Gtk.ApplicationWindow):
 		
 		if Gtk.get_minor_version() > 8:
 			self.set_titlebar (self.headerbar)
-			self.add(self.gamelist)
+			
+			box = Gtk.Box (orientation=Gtk.Orientation.VERTICAL, spacing=0)
+			box.show ()
+			
+			box.pack_end (self.gamelist, True, True, 0)
+			box.pack_end (self.gameview, True, True, 0)
+			self.add(box)
+			
 		else:
 			box = Gtk.Box (orientation=Gtk.Orientation.VERTICAL, spacing=0)
 			box.show ()
@@ -58,12 +65,12 @@ class BadnikWindow(Gtk.ApplicationWindow):
 		self.gamelist.connect('game_clicked', self.on_game_clicked)
 		
 		self.headerbar.show ()
-		self.gamelist.show ()
-		self.gameview.show ()
+		
+		self.set_mode ('list')
 		self.show ()
 	
 	def on_previous_clicked(self, button):
-		print ("previous clicked")
+		self.set_mode ('list')
 	
 	def on_add_games_clicked(self, button):
 		print ("add games clicked")
@@ -73,5 +80,22 @@ class BadnikWindow(Gtk.ApplicationWindow):
 	
 	def on_game_clicked(self, view, game):
 		self.gameview.set_game (game)
-		print ("game", game.get_reference (), "clicked")
+		self.set_mode ('game')
+	
+	def set_mode (self, mode):
+		if mode == 'list':
+			self.gamelist.show ()
+			self.gameview.hide ()
+			
+			self.headerbar.previous_button.hide ()
+			self.headerbar.add_games_button.show ()
+			self.headerbar.play_game_button.hide ()
+		
+		elif mode == 'game':
+			self.gamelist.hide ()
+			self.gameview.show ()
+			
+			self.headerbar.previous_button.show ()
+			self.headerbar.add_games_button.hide ()
+			self.headerbar.play_game_button.show ()
 

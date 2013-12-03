@@ -228,12 +228,12 @@ class GameView(Gtk.ScrolledWindow):
 		self.title.set_markup("<span size='large'>" + title + "</span>")
 		
 		# Set the developers
-		#developer = info.get_property ("developers")
-		#if len (developer) > 0:
-		#	developer = ", ".join (developer)
-		#else:
-		#	developer = "Unknown developer"
-		#self.developer.set_markup("<span size='large'>" + developer + "</span>")
+		developer = info.get_developers ()
+		if len (developer) > 0:
+			developer = ", ".join (developer)
+		else:
+			developer = "Unknown developer"
+		self.developer.set_markup("<span size='large'>" + developer + "</span>")
 		
 		# Set the cover
 		#icon = info.get_pixbuf(self.cover_size, 0)

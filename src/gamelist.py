@@ -156,7 +156,7 @@ class GameList(Gtk.Box):
 			Gdk.threads_leave()
 		else:
 			self.add_game(gameref)
-	
+		
 	def show_game_list(self):
 		self.app.focus_game(None)
 		self.view.show()
