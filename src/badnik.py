@@ -220,13 +220,17 @@ class GameProcess(GObject.Object, Thread):
 		if self.game.query_is_available():
 			args = shlex.split(self.game.get_exec())
 			
+			Gdk.threads_enter ()
 			self.emit('game_started', self.game)
+			Gdk.threads_leave ()
 			
 			start_time = time.time()
 			return_code = subprocess.call(args, stdout=self.out, stderr=self.err)
 			end_time = time.time()
 			
+			Gdk.threads_enter ()
 			self.emit('game_stopped', self.game, int(return_code), int(start_time), int(end_time))
+			Gdk.threads_leave ()
 
 if __name__ == '__main__':
 	start_time = time.time()
