@@ -17,12 +17,13 @@
 #    
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
-from gi.repository import Gtk, Gdk, GLib, Gio
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject
 import sys, os
 from threading import Thread
 from xdg import BaseDirectory
 
 from badnikwindow import BadnikWindow
+from gamelist import GameList
 from badniklibrary import BadnikLibrary
 
 import time
@@ -79,16 +80,20 @@ class BadnikApplication(Gtk.Application):
 		self.running_games = {}
 	
 	def on_activate(self, data=None):
-		print (time.time()-start_time, "start activating application")
-		print("start window")
+		#print (time.time()-start_time, "start activating application")
+		#print("start window")
 		self.window = BadnikWindow(self)
-		print("stop  window")
+		self.window.connect('play_clicked', self.on_play_clicked)
+		#print("stop  window")
 		self.window.connect("destroy", self.on_quit, None)
 		self.window.show()
 		self.add_window(self.window)
 		
 		self.update_library_async()
-		print (time.time()-start_time, "end activating application")
+		#print (time.time()-start_time, "end activating application")
+	
+	def on_play_clicked(self, window, game):
+		self.play(game)
 	
 	def _add_actions(self):
 		for action_entry in self._action_entries:
@@ -168,12 +173,11 @@ class BadnikApplication(Gtk.Application):
 	def update_library_async(self):
 		Thread(target=self.update_library, args=(), kwargs={}).start()
 		
-	def play_game(self, id=None):
-		id = id if id else self.focused_game
-		
+	def play(self, game):
+		id = GameList.get_game_reference (game)
 		if id and (not (id in self.running_games) or self.running_games[id] == False):
 			self.running_games[id] = True
-			p = GameProcess(self.gamesdb, id)
+			p = GameProcess(game)
 			p.connect('game_started', self.on_game_started)
 			p.connect('game_stopped', self.on_game_stopped)
 			p.start()
@@ -181,15 +185,16 @@ class BadnikApplication(Gtk.Application):
 	def focus_game(self, id):
 		self.focused_game = id
 	
-	def on_game_started(self, process, id):
+	def on_game_started(self, process, game):
 		pass
 	
-	def on_game_stopped(self, process, id, return_code, start_time, end_time):
+	def on_game_stopped(self, process, game, return_code, start_time, end_time):
+		id = GameList.get_game_reference (game)
 		self.running_games[id] = False
 		time_played = end_time - start_time
 		
 		if return_code == 0 or time_played > 10:
-			self.gamesdb.update_game_play_time(id, start_time, end_time)
+			game.update_play_time(start_time, end_time)
 
 from gi.repository import GObject
 
@@ -200,29 +205,28 @@ class GameProcess(GObject.Object, Thread):
 	'''A class representing an asynchronous game process.'''
 	
 	__gsignals__ = {
-		'game_started': (GObject.SIGNAL_RUN_FIRST, None, (int,)),
-		'game_stopped': (GObject.SIGNAL_RUN_FIRST, None, (int, int, int, int)) # Parameters are the game ID, the process's result, the start time and the end time
+		'game_started': (GObject.SIGNAL_RUN_FIRST, None, (object,)),
+		'game_stopped': (GObject.SIGNAL_RUN_FIRST, None, (object, int, int, int)) # Parameters are the game ID, the process's result, the start time and the end time
 	}
 	
-	def __init__(self, gamesdb, id, out=subprocess.DEVNULL, err=subprocess.DEVNULL):
+	def __init__(self, game, out=subprocess.DEVNULL, err=subprocess.DEVNULL):
 		GObject.Object.__init__(self)
 		Thread.__init__(self)
-		self.gamesdb = gamesdb
-		self.id = id
+		self.game = game
 		self.out = out
 		self.err = err
 	
 	def run(self):
-		if self.gamesdb.query_is_game_available(self.id):
-			args = shlex.split(self.gamesdb.get_game_exec(self.id))
+		if self.game.query_is_available():
+			args = shlex.split(self.game.get_exec())
 			
-			self.emit('game_started', int(self.id))
+			self.emit('game_started', self.game)
 			
 			start_time = time.time()
 			return_code = subprocess.call(args, stdout=self.out, stderr=self.err)
 			end_time = time.time()
 			
-			self.emit('game_stopped', int(self.id), int(return_code), int(start_time), int(end_time))
+			self.emit('game_stopped', self.game, int(return_code), int(start_time), int(end_time))
 
 if __name__ == '__main__':
 	start_time = time.time()

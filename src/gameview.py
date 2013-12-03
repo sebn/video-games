@@ -213,10 +213,16 @@ class GameView(Gtk.ScrolledWindow):
 		self.grid.show()
 		
 		self.add_with_viewport(self.grid)
+		
+		self.game = None
 	
 	def set_game(self, game):
 		self.game = game
+		game.connect('updated', self.on_game_updated)
 		self._set_informations_from_game()
+	
+	def on_game_updated (self, game):
+		self._set_informations_from_game ()
 	
 	def _set_informations_from_game(self):
 		info = self.game.get_info()
@@ -308,13 +314,18 @@ class GameView(Gtk.ScrolledWindow):
 			self.time_played.set_text("Never")
 		
 		# Set the players number
-		#if info.get_property("players"):
-		#	self._players.show()
-		#	self.players.show()
-		#	self.players.set_text(info.get_property("players"))
-		#else:
-		#	self._players.hide()
-		#	self.players.hide()
+		min_players = info.get_property("min_players")
+		max_players = info.get_property("max_players")
+		if min_players > 0 and max_players > 0:
+			self._players.show()
+			self.players.show()
+			if min_players == max_players:
+				self.players.set_text(str(min_players))
+			else:
+				self.players.set_text(str(min_players) + '-' + str(max_players))
+		else:
+			self._players.hide()
+			self.players.hide()
 		
 		# Set the online mode
 		#if info.get_property("online"):

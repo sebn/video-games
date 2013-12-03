@@ -18,13 +18,17 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
 
 from headerbar import Headerbar
 from gamelist import GameList
 from gameview import GameView
 
 class BadnikWindow(Gtk.ApplicationWindow):
+	__gsignals__ = {
+		'play_clicked': (GObject.SIGNAL_RUN_FIRST, None, (object,))
+	}
+	
 	def __init__(self, app):
 		Gtk.Window.__init__(self, type=Gtk.WindowType.TOPLEVEL, title=app.fullname, application=app)
 		self.set_wmclass ("Badnik", "Badnik")
@@ -78,9 +82,11 @@ class BadnikWindow(Gtk.ApplicationWindow):
 		print ("add games clicked")
 	
 	def on_play_game_clicked(self, button):
+		self.emit("play_clicked", self.game)
 		print ("play game clicked")
 	
 	def on_game_clicked(self, view, game):
+		self.game = game
 		self.gameview.set_game (game)
 		self.set_mode ('game')
 	
