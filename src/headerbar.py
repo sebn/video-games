@@ -62,12 +62,8 @@ else:
 			self.add_games_button = self.add_button('list-add-symbolic', "Add games", True)
 			self.play_game_button = self.add_button('media-playback-start-symbolic', "Play the game", True)
 			
-			self.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+			#self.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 			self.set_show_modes(False)
-			
-			self.pack_start (self.previous_button)
-			self.pack_start (self.add_games_button)
-			self.pack_start (self.play_game_button)
 			
 			self.show_all()
 

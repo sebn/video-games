@@ -27,6 +27,7 @@ SOURCES = \
 	src/badnikwindow.py \
 	src/headerbar.py \
 	src/gameview.py \
+	src/gamelist.py \
 	src/main.py \
 	src/metadata/__init__.py \
 	src/metadata/mobygames.py \

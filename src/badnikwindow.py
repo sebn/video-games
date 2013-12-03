@@ -20,31 +20,58 @@
 
 from gi.repository import Gtk
 
-from gameview import MainGameView
-
 from headerbar import Headerbar
+from gamelist import GameList
+from gameview import GameView
 
 class BadnikWindow(Gtk.ApplicationWindow):
 	def __init__(self, app):
 		Gtk.Window.__init__(self, type=Gtk.WindowType.TOPLEVEL, title=app.fullname, application=app)
 		self.set_wmclass ("Badnik", "Badnik")
 		self.set_default_icon_name('badnik')
-		#self.set_hide_titlebar_when_maximized(True)
 		
 		self.app = app
 		
 		self.set_default_size(800, 600)
 		self.set_position(Gtk.WindowPosition.CENTER)
 		
-		self.view = MainGameView(app)
-		self.view.show()
-		self.add(self.view)
 		
 		self.headerbar = Headerbar ()
+		self.gamelist = GameList(app)
+		self.gameview = GameView()
 		
 		if Gtk.get_minor_version() > 8:
 			self.set_titlebar (self.headerbar)
-			pass
+			self.add(self.gamelist)
+		else:
+			box = Gtk.Box (orientation=Gtk.Orientation.VERTICAL, spacing=0)
+			box.show ()
+			
+			box.pack_start (self.headerbar, False, False, 0)
+			box.pack_end (self.gamelist, True, True, 0)
+			box.pack_end (self.gameview, True, True, 0)
+			self.add(box)
 		
-		self.show_all ()
+		self.headerbar.previous_button.connect('clicked', self.on_previous_clicked)
+		self.headerbar.add_games_button.connect('clicked', self.on_add_games_clicked)
+		self.headerbar.play_game_button.connect('clicked', self.on_play_game_clicked)
+		self.gamelist.connect('game_clicked', self.on_game_clicked)
+		
+		self.headerbar.show ()
+		self.gamelist.show ()
+		self.gameview.show ()
+		self.show ()
+	
+	def on_previous_clicked(self, button):
+		print ("previous clicked")
+	
+	def on_add_games_clicked(self, button):
+		print ("add games clicked")
+	
+	def on_play_game_clicked(self, button):
+		print ("play game clicked")
+	
+	def on_game_clicked(self, view, game):
+		self.gameview.set_game (game)
+		print ("game", game.get_reference (), "clicked")
 

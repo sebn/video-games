@@ -23,227 +23,12 @@ import time
 
 from threading import Thread
 
-class MainGameView(Gtk.Box):
-	def __init__(self, app):
-		Gtk.Box.__init__(self, orientation = Gtk.Orientation.VERTICAL)
-		
-		self.set_size_request(640, 480)
-		
-		self.app = app
-		self.app.gamesdb.connect('game_updated', self.on_game_updated)
-		
-		self.model = Gtk.ListStore(str,              # id     (game id)
-		                           str,              # uri
-		                           str,              # name   (game title)
-		                           str,              # author (game developer)
-		                           GdkPixbuf.Pixbuf, # pixbuf (game cover or icon)
-		                           int,              # mtime  (last modification time in seconds)
-		                           bool              # ???
-		                           )
-		
-		self.gameview = None
-		
-		if Gtk.get_minor_version() > 8:
-			self.toolbar = Gtk.HeaderBar()
-			self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR);
-			self.toolbar.set_show_close_button (True)
-			self.toolbar.show_all()
-		else:
-			self.toolbar = Gd.MainToolbar()
-			self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
-			self.toolbar.set_show_modes(False)
-			self.pack_start(self.toolbar, False, True, 0)
-		
-		# Add the "go previous" icon
-		
-		iconname = None
-		if self.toolbar.get_direction() == Gtk.TextDirection.RTL:
-			iconname = 'go-next-symbolic'
-		else:
-			iconname = 'go-previous-symbolic'
-		#self.previous_button = self.toolbar.add_button(iconname, "Previous", True)
-		self.previous_button = Gtk.Button(stock=iconname)
-		#self.previous_button.set_from_icon_name (iconname, Gtk.IconSize.LARGE_TOOLBAR)
-		self.toolbar.pack_start (self.previous_button)
-		self.previous_button.connect('clicked', self.on_previous_button_clicked)
-		
-		# Add the "add games" icon
-		
-		iconname = 'list-add-symbolic'
-		#self.add_games_button = self.toolbar.add_button(iconname, "Add games", True)
-		self.add_games_button = Gtk.Button(stock=iconname)
-		self.add_games_button.connect('clicked', self.on_add_games_button_clicked)
-		
-		# Add the "start game" icon
-		
-		iconname = 'media-playback-start-symbolic'
-		#self.play_game_button = self.toolbar.add_button(iconname, "Play the game", True)
-		self.play_game_button = Gtk.Button(stock=iconname)
-		#self.play_game_button.set_from_icon_name (iconname, Gtk.IconSize.LARGE_TOOLBAR)
-		self.toolbar.pack_start (self.play_game_button)
-		self.play_game_button.connect('clicked', self.on_play_game_button_clicked)
-		
-		self.view = Gd.MainView()
-		self.view.connect('item-activated', self.on_item_activated)
-	#	self.view.connect('selection-mode-request', Lang.bind(this, this._onSelectionModeRequest));
-	#	self.view.connect('view-selection-changed', Lang.bind(this, this._onViewSelectionChanged));
-		self.view.set_model(self.model)
-		
-		self.pack_start(self.view, True, True, 0)
-		
-		self.app.settings.connect('changed::view-as', self.set_view)
-		
-		self.set_view()
-		self.show_game_list()
-		
-		self.populate_async()
-	
-	def has_game(self, id):
-		# Beware of concurrent threads manipulating the same game simulteanously
-		for game in self.model:
-			if id == game[0]:
-				return True
-		return False
-	
-	def add_game(self, game):
-		print ("adding", game.get_reference ())
-		if (not self.has_game(game.get_reference ())) and game.query_is_available():
-			info = game.get_info()
-			if not info:
-				info = Badnik.GameInfo()
-			title = info.get_property("title")
-			#developer = ", ".join (info.get_property("developers"))
-			image = Gtk.Image ()
-			image.set_from_icon_name ("badnik", Gtk.IconSize.BUTTON)
-			icon = image.get_pixbuf()
-			Gdk.threads_enter()
-			#self.view.get_model().append([str(id), "", title, developer, icon, int(time.time()), False])
-			self.view.get_model().append([str(id), "", title, "", icon, int(time.time()), False])
-			Gdk.threads_leave()
-	
-	def set_view(self, settings=None, setting=None):
-		value = self.app.settings.get_value('view-as').get_string()
-		
-		if value == 'icon':
-			self.view.set_view_type(0)
-		elif value == 'list':
-			self.view.set_view_type(1)
-		
-		size = self.get_requiered_pixbuf_size ()
-		#Gdk.threads_enter()
-		for entry in self.model:
-			info = self.app.gamesdb.get_game_info(int(entry[0]))
-			self.model.set_value(entry.iter, 4, info.get_pixbuf(size, 0))
-		#Gdk.threads_leave()
-	
-	def get_requiered_pixbuf_size (self):
-		value = self.app.settings.get_value('view-as').get_string()
-		if value == 'icon':
-			return 128
-		elif value == 'list':
-			return 48
-		else:
-			return 128
-	
-	def populate(self):
-		for game in self.app.gamesdb.get_games ():
-			self.add_game(game)
-	
-	def populate_async(self):
-		Thread(target=self.populate, args=(), kwargs={}).start()
-	
-	def on_item_activated(self, view, itemid, itemindex):
-		self.show_game(itemid)
-	
-	def on_previous_button_clicked(self, button):
-		self.show_game_list()
-	
-	def on_add_games_button_clicked(self, button):
-		self.show_game_list()
-	
-	def on_play_game_button_clicked(self, button):
-		self.app.play_game()
-	
-	def on_game_updated(self, application, id):
-		# Get the relative entry in the model
-		iter = None
-		
-		#Gdk.threads_enter ()
-		for game in self.model:
-			if int(game[0]) == int(id):
-				iter = game.iter
-				break
-		#Gdk.threads_leave ()
-		
-		# It is extremly important to use Gdk.threads_enter() and
-		# Gdk.threads_leave() : it allows to synchronise the Gdk (Gtk)
-		# thread with any thread calling it.
-		# Every signal handling function (or method) should use them.
-		
-		if iter:
-			info = self.app.gamesdb.get_game_info(id)
-			Gdk.threads_enter()
-			self.model.set_value(iter, 2, info.get_property("title"))
-			self.model.set_value(iter, 3, info.get_property("developer"))
-			self.model.set_value(iter, 4, info.get_pixbuf(self.get_requiered_pixbuf_size (), 0))
-			self.model.set_value(iter, 5, int(time.time()))
-			Gdk.threads_leave()
-		else:
-			self.add_game(id)
-	
-	def show_game_list(self):
-		self.app.focus_game(None)
-		
-		# Hide
-		
-		#self.toolbar.set_labels(None, None)
-		self.toolbar.set_title("")
-		self.toolbar.set_subtitle(None)
-		if self.gameview:
-			self.gameview.hide()
-		self.previous_button.hide()
-		self.play_game_button.hide()
-		
-		#Show
-		
-		self.view.show()
-		self.add_games_button.show()
-	
-	def show_game(self, id):
-		id = id
-		self.app.focus_game(id)
-		#try:
-		#	Thread(target=self.app.gamesdb.download_game_metadata, args=(self.app.focused_game, ),).start()
-		#except:
-		#	print("Can't download metadata.")
-		
-		# Show
-		info = self.app.gamesdb.get_game_info(id)
-		#self.toolbar.set_labels(info.get_property("title"), None)
-		self.toolbar.set_title(info.get_property("title"))
-		if self.gameview:
-			self.gameview.set_game(id)
-		else:
-			self.gameview = GameView(self.app, id)
-			self.pack_end(self.gameview, True, True, 0)
-		self.gameview.show()
-		self.previous_button.show()
-		self.play_game_button.show()
-		
-		# Hide
-		
-		self.view.hide()
-		self.add_games_button.hide()
-
 class GameView(Gtk.ScrolledWindow):
-	def __init__(self, app, id):
+	def __init__(self):
 		Gtk.ScrolledWindow.__init__(self)
 		self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 		#context = self.get_style_context()
 		#context.add_class("documents-scrolledwin")
-		
-		self.app = app
-		self.app.gamesdb.connect('game_updated', self.on_game_updated)
 		
 		self.cover_size = 256
 		
@@ -428,20 +213,13 @@ class GameView(Gtk.ScrolledWindow):
 		self.grid.show()
 		
 		self.add_with_viewport(self.grid)
-		self.show()
-		
-		self.set_game(id)
 	
-	def set_game(self, id):
-		self.id = int(id)
+	def set_game(self, game):
+		self.game = game
 		self._set_informations_from_game()
 	
-	def on_game_updated(self, application, id):
-		if self.app.focused_game and int(self.app.focused_game) == int(id):
-			self._set_informations_from_game()
-	
 	def _set_informations_from_game(self):
-		info = self.app.gamesdb.get_game_info(self.app.focused_game)
+		info = self.game.get_info()
 		
 		#Gdk.threads_enter ()
 		
@@ -449,40 +227,44 @@ class GameView(Gtk.ScrolledWindow):
 		title = info.get_property("title") if info.get_property("title") else "Unknown title"
 		self.title.set_markup("<span size='large'>" + title + "</span>")
 		
-		# Set the developer
-		developer = info.get_property("developer") if info.get_property("developer") else "Unknown developer"
-		self.developer.set_markup("<span size='large'>" + developer + "</span>")
+		# Set the developers
+		#developer = info.get_property ("developers")
+		#if len (developer) > 0:
+		#	developer = ", ".join (developer)
+		#else:
+		#	developer = "Unknown developer"
+		#self.developer.set_markup("<span size='large'>" + developer + "</span>")
 		
 		# Set the cover
-		icon = info.get_pixbuf(self.cover_size, 0)
-		self.cover.set_from_pixbuf(icon)
+		#icon = info.get_pixbuf(self.cover_size, 0)
+		#self.cover.set_from_pixbuf(icon)
 		
 		# Set the release year
-		if info.get_property("released"):
-			self._release_year.show()
-			self.release_year.show()
-			self.release_year.set_text(info.get_property("released"))
-		else:
-			self._release_year.hide()
-			self.release_year.hide()
+		#if info.get_property("released"):
+		#	self._release_year.show()
+		#	self.release_year.show()
+		#	self.release_year.set_text(info.get_property("released"))
+		#else:
+		#	self._release_year.hide()
+		#	self.release_year.hide()
 		
 		# Set the system
-		if info.get_property("system"):
-			self._system.show()
-			self.system.show()
-			self.system.set_text(info.get_property("system").get_name())
-		else:
-			self._system.hide()
-			self.system.hide()
+		#if info.get_property("system"):
+		#	self._system.show()
+		#	self.system.show()
+		#	self.system.set_text(info.get_property("system").get_name())
+		#else:
+		#	self._system.hide()
+		#	self.system.hide()
 		
 		# Set the genre
-		if info.get_property("genre"):
-			self._genre.show()
-			self.genre.show()
-			self.genre.set_text(info.get_property("genre"))
-		else:
-			self._genre.hide()
-			self.genre.hide()
+		#if info.get_property("genre"):
+		#	self._genre.show()
+		#	self.genre.show()
+		#	self.genre.set_text(info.get_property("genre"))
+		#else:
+		#	self._genre.hide()
+		#	self.genre.hide()
 		
 		# Set the play informations
 		if info.get_property("played") > 0:
@@ -526,22 +308,22 @@ class GameView(Gtk.ScrolledWindow):
 			self.time_played.set_text("Never")
 		
 		# Set the players number
-		if info.get_property("players"):
-			self._players.show()
-			self.players.show()
-			self.players.set_text(info.get_property("players"))
-		else:
-			self._players.hide()
-			self.players.hide()
+		#if info.get_property("players"):
+		#	self._players.show()
+		#	self.players.show()
+		#	self.players.set_text(info.get_property("players"))
+		#else:
+		#	self._players.hide()
+		#	self.players.hide()
 		
 		# Set the online mode
-		if info.get_property("online"):
-			self._online.show()
-			self.online.show()
-			self.online.set_text(info.get_property("online"))
-		else:
-			self._online.hide()
-			self.online.hide()
+		#if info.get_property("online"):
+		#	self._online.show()
+		#	self.online.show()
+		#	self.online.set_text(info.get_property("online"))
+		#else:
+		#	self._online.hide()
+		#	self.online.hide()
 		
 		# Set description
 		if info.get_property("description"):
