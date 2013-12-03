@@ -43,11 +43,16 @@ class MainGameView(Gtk.Box):
 		
 		self.gameview = None
 		
-		self.toolbar = Gd.MainToolbar()
-		#self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
-		self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR);
-		self.toolbar.set_show_modes(False)
-		self.toolbar.show_all()
+		if Gtk.get_minor_version() > 8:
+			self.toolbar = Gtk.HeaderBar()
+			self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR);
+			self.toolbar.set_show_close_button (True)
+			self.toolbar.show_all()
+		else:
+			self.toolbar = Gd.MainToolbar()
+			self.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+			self.toolbar.set_show_modes(False)
+			self.pack_start(self.toolbar, False, True, 0)
 		
 		# Add the "go previous" icon
 		
@@ -56,19 +61,26 @@ class MainGameView(Gtk.Box):
 			iconname = 'go-next-symbolic'
 		else:
 			iconname = 'go-previous-symbolic'
-		self.previous_button = self.toolbar.add_button(iconname, "Previous", True)
+		#self.previous_button = self.toolbar.add_button(iconname, "Previous", True)
+		self.previous_button = Gtk.Button(stock=iconname)
+		#self.previous_button.set_from_icon_name (iconname, Gtk.IconSize.LARGE_TOOLBAR)
+		self.toolbar.pack_start (self.previous_button)
 		self.previous_button.connect('clicked', self.on_previous_button_clicked)
 		
 		# Add the "add games" icon
 		
 		iconname = 'list-add-symbolic'
-		self.add_games_button = self.toolbar.add_button(iconname, "Add games", True)
+		#self.add_games_button = self.toolbar.add_button(iconname, "Add games", True)
+		self.add_games_button = Gtk.Button(stock=iconname)
 		self.add_games_button.connect('clicked', self.on_add_games_button_clicked)
 		
 		# Add the "start game" icon
 		
 		iconname = 'media-playback-start-symbolic'
-		self.play_game_button = self.toolbar.add_button(iconname, "Play the game", True)
+		#self.play_game_button = self.toolbar.add_button(iconname, "Play the game", True)
+		self.play_game_button = Gtk.Button(stock=iconname)
+		#self.play_game_button.set_from_icon_name (iconname, Gtk.IconSize.LARGE_TOOLBAR)
+		self.toolbar.pack_start (self.play_game_button)
 		self.play_game_button.connect('clicked', self.on_play_game_button_clicked)
 		
 		self.view = Gd.MainView()
@@ -77,7 +89,6 @@ class MainGameView(Gtk.Box):
 	#	self.view.connect('view-selection-changed', Lang.bind(this, this._onViewSelectionChanged));
 		self.view.set_model(self.model)
 		
-		self.pack_start(self.toolbar, False, True, 0)
 		self.pack_start(self.view, True, True, 0)
 		
 		self.app.settings.connect('changed::view-as', self.set_view)
@@ -90,20 +101,24 @@ class MainGameView(Gtk.Box):
 	def has_game(self, id):
 		# Beware of concurrent threads manipulating the same game simulteanously
 		for game in self.model:
-			if int(id) == int(game[0]):
+			if id == game[0]:
 				return True
 		return False
 	
-	def add_game(self, id):
-		if (not self.has_game(id)) and self.app.gamesdb.query_is_game_available(id):
-			info = self.app.gamesdb.get_game_info(id)
+	def add_game(self, game):
+		print ("adding", game.get_reference ())
+		if (not self.has_game(game.get_reference ())) and game.query_is_available():
+			info = game.get_info()
 			if not info:
 				info = Badnik.GameInfo()
 			title = info.get_property("title")
-			developer = info.get_property("developer")
-			icon = info.get_pixbuf(self.get_requiered_pixbuf_size (), 0)
+			#developer = ", ".join (info.get_property("developers"))
+			image = Gtk.Image ()
+			image.set_from_icon_name ("badnik", Gtk.IconSize.BUTTON)
+			icon = image.get_pixbuf()
 			Gdk.threads_enter()
-			self.view.get_model().append([str(id), "", title, developer, icon, int(time.time()), False])
+			#self.view.get_model().append([str(id), "", title, developer, icon, int(time.time()), False])
+			self.view.get_model().append([str(id), "", title, "", icon, int(time.time()), False])
 			Gdk.threads_leave()
 	
 	def set_view(self, settings=None, setting=None):
@@ -131,8 +146,8 @@ class MainGameView(Gtk.Box):
 			return 128
 	
 	def populate(self):
-		for id in self.app.gamesdb.get_games_id():
-			self.add_game(id)
+		for game in self.app.gamesdb.get_games ():
+			self.add_game(game)
 	
 	def populate_async(self):
 		Thread(target=self.populate, args=(), kwargs={}).start()
@@ -181,7 +196,9 @@ class MainGameView(Gtk.Box):
 		
 		# Hide
 		
-		self.toolbar.set_labels(None, None)
+		#self.toolbar.set_labels(None, None)
+		self.toolbar.set_title("")
+		self.toolbar.set_subtitle(None)
 		if self.gameview:
 			self.gameview.hide()
 		self.previous_button.hide()
@@ -193,7 +210,7 @@ class MainGameView(Gtk.Box):
 		self.add_games_button.show()
 	
 	def show_game(self, id):
-		id = int(id)
+		id = id
 		self.app.focus_game(id)
 		#try:
 		#	Thread(target=self.app.gamesdb.download_game_metadata, args=(self.app.focused_game, ),).start()
@@ -202,7 +219,8 @@ class MainGameView(Gtk.Box):
 		
 		# Show
 		info = self.app.gamesdb.get_game_info(id)
-		self.toolbar.set_labels(info.get_property("title"), None)
+		#self.toolbar.set_labels(info.get_property("title"), None)
+		self.toolbar.set_title(info.get_property("title"))
 		if self.gameview:
 			self.gameview.set_game(id)
 		else:

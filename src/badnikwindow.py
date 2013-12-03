@@ -22,12 +22,14 @@ from gi.repository import Gtk
 
 from gameview import MainGameView
 
+from headerbar import Headerbar
+
 class BadnikWindow(Gtk.ApplicationWindow):
 	def __init__(self, app):
 		Gtk.Window.__init__(self, type=Gtk.WindowType.TOPLEVEL, title=app.fullname, application=app)
 		self.set_wmclass ("Badnik", "Badnik")
 		self.set_default_icon_name('badnik')
-		self.set_hide_titlebar_when_maximized(True)
+		#self.set_hide_titlebar_when_maximized(True)
 		
 		self.app = app
 		
@@ -37,4 +39,12 @@ class BadnikWindow(Gtk.ApplicationWindow):
 		self.view = MainGameView(app)
 		self.view.show()
 		self.add(self.view)
+		
+		self.headerbar = Headerbar ()
+		
+		if Gtk.get_minor_version() > 8:
+			self.set_titlebar (self.headerbar)
+			pass
+		
+		self.show_all ()
 
