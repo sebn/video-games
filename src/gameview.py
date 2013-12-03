@@ -21,6 +21,8 @@ from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 from gi.repository import Gd, Badnik
 import time
 
+from gameinfo import GameInfo
+
 from threading import Thread
 
 class GameView(Gtk.ScrolledWindow):
@@ -242,8 +244,8 @@ class GameView(Gtk.ScrolledWindow):
 		self.developer.set_markup("<span size='large'>" + developer + "</span>")
 		
 		# Set the cover
-		#icon = info.get_pixbuf(self.cover_size, 0)
-		#self.cover.set_from_pixbuf(icon)
+		icon = GameInfo(info).get_pixbuf(self.cover_size, 0)
+		self.cover.set_from_pixbuf(icon)
 		
 		# Set the release year
 		#if info.get_property("released"):
@@ -346,3 +348,4 @@ class GameView(Gtk.ScrolledWindow):
 			self.description.hide()
 		
 		#Gdk.threads_leave ()
+

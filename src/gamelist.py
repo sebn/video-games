@@ -21,6 +21,8 @@ from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 from gi.repository import Gd, Badnik
 import time
 
+from gameinfo import GameInfo
+
 from threading import Thread
 
 class GameList(Gtk.Box):
@@ -82,9 +84,7 @@ class GameList(Gtk.Box):
 			title = info.get_property("title")
 			#developer = ", ".join (info.get_property("developers"))
 			developer = ""
-			image = Gtk.Image ()
-			image.set_from_icon_name ("badnik", Gtk.IconSize.BUTTON)
-			icon = image.get_pixbuf()
+			icon = GameInfo(info).get_pixbuf(self.get_requiered_pixbuf_size (), 0)
 			
 			Gdk.threads_enter()
 			self.view.get_model().append([id, "", title, developer, icon, int(time.time()), False])
