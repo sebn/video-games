@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    main.py A Python module to launch Badnik with the required environment.
+#    main.py, launch Video Games with the required environment.
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify

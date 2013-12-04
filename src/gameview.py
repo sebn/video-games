@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    gameview.py A Widget 
+#    gameview.py, display a game .
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify

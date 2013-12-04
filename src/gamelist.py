@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    gamelist.py A Widget 
+#    gamelist.py, display a list of games.
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify

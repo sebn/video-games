@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    headerbar.py A Widget 
+#    headerbar.py, a header bar.
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    gameinfo.py A Widget 
+#    gameinfo.py, help to handle game metadata.
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify
@@ -46,3 +46,4 @@ class GameInfo:
 					pass
 		
 		return None
+

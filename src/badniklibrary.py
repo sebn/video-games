@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    tosec.py Managing a video game library.
+#    badniklibrary.py, the library of Video Games.
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify

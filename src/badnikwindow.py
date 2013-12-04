@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#    badnikwindow.py A Python module to use TOSEC data files as a SQLite database.
+#    badnikwindow.py, the window of Video Games.
 #    Copyright (C) 2013 Adrien Plazas
 #    
 #    This program is free software: you can redistribute it and/or modify
