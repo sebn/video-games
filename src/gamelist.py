@@ -80,14 +80,19 @@ class GameList(Gtk.Box):
 				info = Badnik.GameInfo()
 			
 			id = GameList.get_game_reference (game)
-			
-			title = info.get_property("title")
-			#developer = ", ".join (info.get_property("developers"))
-			developer = ""
+			uri = ""
+			primary_text = info.get_property("title")
+			secondary_text = ", ".join (info.get_developers ())
 			icon = GameInfo(info).get_pixbuf(self.get_requiered_pixbuf_size (), 0)
+			mtime = int(time.time())
+			selected = False
+			pulse = False
+			last = False
+			
+			entry = [id, uri, primary_text, secondary_text, icon, mtime, selected]
 			
 			Gdk.threads_enter()
-			self.view.get_model().append([id, "", title, developer, icon, int(time.time()), False])
+			self.view.get_model().append(entry)
 			Gdk.threads_leave()
 			
 			self.games[id] = game
