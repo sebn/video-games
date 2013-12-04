@@ -103,6 +103,9 @@ class BadnikWindow(Gtk.ApplicationWindow):
 			self.headerbar.previous_button.hide ()
 			self.headerbar.add_games_button.show ()
 			self.headerbar.play_game_button.hide ()
+			
+			self.headerbar.set_title ("")
+			self.headerbar.set_custom_title (None)
 		
 		elif mode == 'game':
 			if Gtk.get_minor_version() > 8:
@@ -116,4 +119,7 @@ class BadnikWindow(Gtk.ApplicationWindow):
 			self.headerbar.previous_button.show ()
 			self.headerbar.add_games_button.hide ()
 			self.headerbar.play_game_button.show ()
+			
+			self.headerbar.set_title (self.game.get_title())
+			self.headerbar.set_custom_title (None)
 
