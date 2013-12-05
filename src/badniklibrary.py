@@ -32,7 +32,4 @@ class BadnikLibrary(Badnik.Library):
 		
 		self.app = app
 		self.path = os.path.join(save_data_dir, "games.db")
-		
-		self.add_system(Badnik.MegaDrive ())
-		self.add_system(Badnik.Desktop ())
 

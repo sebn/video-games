@@ -18,6 +18,7 @@
 #    Adrien Plazas <mailto:kekun.plazas@laposte.net>
 
 from gi.repository import Gtk, Gdk, GLib, Gio, GObject
+from gi.repository import Badnik
 import sys, os
 from threading import Thread
 from xdg import BaseDirectory
@@ -43,6 +44,10 @@ class BadnikApplication(Gtk.Application):
 		self.iconsdir = self.datadir + "/data/icons"
 		self.tosecdir = self.datadir + "/data/tosec"
 		self.srcdir = self.datadir + "/src"
+		
+		self.systems = Badnik.SystemCollection ()
+		self.systems.add (Badnik.MegaDrive ())
+		self.systems.add (Badnik.Desktop ())
 		
 		self.gamesdb = BadnikLibrary(self, self.savedatadir)
 		
@@ -78,6 +83,8 @@ class BadnikApplication(Gtk.Application):
 		print (time.time()-start_time, "end init application")
 		
 		self.running_games = {}
+		
+		self.systems.connect("game_found", self.on_game_found)
 	
 	def on_activate(self, data=None):
 		#print (time.time()-start_time, "start activating application")
@@ -120,7 +127,8 @@ class BadnikApplication(Gtk.Application):
 	def on_quit(self, action, data):
 		print("Quitting Badnik")
 		self.window.hide()
-		self.gamesdb.set_property("stop_searches", True)
+		self.systems.set_property("stop_searches", True)
+		#self.gamesdb.set_property("stop_searches", True)
 		self.quit()
 	
 	def on_about(self, action, data):
@@ -158,9 +166,13 @@ class BadnikApplication(Gtk.Application):
 	def on_add_games(self, action, data):
 		print("add games")
 	
+	def on_game_found (self, systems, system, uri):
+		gamesdb.add_game (system, uri)
+	
 	def on_download_metadata(self, action, data):
 		if (self.focused_game):
-			self.gamesdb.download_game_metadata(self.focused_game)
+			#self.gamesdb.download_game_metadata(self.focused_game)
+			pass
 	
 	def _view_as_create_hook(self, action):
 		def _changed_view_as(settings, setting):
@@ -168,7 +180,8 @@ class BadnikApplication(Gtk.Application):
 		self.settings.connect('changed::view-as', _changed_view_as)
 	
 	def update_library(self):
-		self.gamesdb.search_games()
+		self.systems.search_games()
+		#self.gamesdb.search_games()
 	
 	def update_library_async(self):
 		Thread(target=self.update_library, args=(), kwargs={}).start()

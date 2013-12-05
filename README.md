@@ -5,9 +5,6 @@ Video Games
 
 Video Games is a video game manager and launcher for GNOME.
 
-Installation
-============
-
 Dependencies
 ------------
 

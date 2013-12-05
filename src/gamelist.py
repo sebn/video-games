@@ -98,7 +98,7 @@ class GameList(Gtk.Box):
 			self.games[id] = game
 	
 	def get_game_reference (game):
-		return game.get_system ().get_reference () + ":" + game.get_reference ()
+		return game.get_property ("system").get_reference () + ":" + game.get_reference ()
 	
 	def set_view(self, settings=None, setting=None):
 		value = self.app.settings.get_value('view-as').get_string()
@@ -125,7 +125,7 @@ class GameList(Gtk.Box):
 			return 128
 	
 	def populate(self):
-		for game in self.app.gamesdb.get_games ():
+		for game in self.app.gamesdb.get_games (self.app.systems):
 			self.add_game(game)
 	
 	def populate_async(self):
