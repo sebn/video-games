@@ -85,6 +85,7 @@ class BadnikApplication(Gtk.Application):
 		self.running_games = {}
 		
 		self.systems.connect("game_found", self.on_game_found)
+		self.gamesdb.connect("game_added", self.on_game_added)
 	
 	def on_activate(self, data=None):
 		#print (time.time()-start_time, "start activating application")
@@ -168,6 +169,9 @@ class BadnikApplication(Gtk.Application):
 	
 	def on_game_found (self, systems, system, uri):
 		self.gamesdb.add_game (system, uri)
+	
+	def on_game_added (self, library, game):
+		self.window.gamelist.add_game (game)
 	
 	def on_download_metadata(self, action, data):
 		if (self.focused_game):
