@@ -167,7 +167,7 @@ class BadnikApplication(Gtk.Application):
 		print("add games")
 	
 	def on_game_found (self, systems, system, uri):
-		gamesdb.add_game (system, uri)
+		self.gamesdb.add_game (system, uri)
 	
 	def on_download_metadata(self, action, data):
 		if (self.focused_game):

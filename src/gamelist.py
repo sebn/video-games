@@ -73,7 +73,6 @@ class GameList(Gtk.Box):
 		return False
 	
 	def add_game(self, game):
-		print ("adding", game.get_reference ())
 		if (not self.has_game(GameList.get_game_reference (game))) and game.query_is_available():
 			info = game.get_info()
 			if not info:
