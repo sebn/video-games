@@ -22,9 +22,6 @@ import os.path
 
 from gi.repository import Badnik
 
-#from systems import desktop
-import systems
-
 class BadnikLibrary(Badnik.Library):
 	'''A games dedicated database'''
 	def __init__(self, app, save_data_dir):

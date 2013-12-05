@@ -252,11 +252,16 @@ class GameView(Gtk.ScrolledWindow):
 		self.cover.set_from_pixbuf(icon)
 		print ("gameview: cover for", self.game.get_reference (), str (icon))
 		
-		# Set the release year
-		if info.get_property("release_date"):
+		# Set the release date
+		date = info.get_property("release_date")
+		if date:
+			year = str (date.get_year ())
+			month = str (int (date.get_month ()))
+			day = str (date.get_day ())
+			
 			self._release_year.show()
 			self.release_year.show()
-			self.release_year.set_text(info.get_property("release_date"))
+			self.release_year.set_text("/".join ((day, month, year)))
 		else:
 			self._release_year.hide()
 			self.release_year.hide()
@@ -338,13 +343,13 @@ class GameView(Gtk.ScrolledWindow):
 			self.players.hide()
 		
 		# Set the online mode
-		#if info.get_property("online"):
-		#	self._online.show()
-		#	self.online.show()
-		#	self.online.set_text(info.get_property("online"))
-		#else:
-		#	self._online.hide()
-		#	self.online.hide()
+		if info.get_property("online"):
+			self._online.show()
+			self.online.show()
+			self.online.set_text(info.get_property("online"))
+		else:
+			self._online.hide()
+			self.online.hide()
 		
 		# Set description
 		if info.get_property("description"):
