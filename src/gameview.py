@@ -227,13 +227,17 @@ class GameView(Gtk.ScrolledWindow):
 		self._set_informations_from_game ()
 	
 	def _set_informations_from_game(self):
+		print ("gameview: getting info for", self.game.get_reference ())
 		info = self.game.get_info()
-		
+		print ("gameview: got info for", self.game.get_reference ())
 		#Gdk.threads_enter ()
 		
 		# Set the title
+		
 		title = info.get_property("title") if info.get_property("title") else "Unknown title"
-		self.title.set_markup("<span size='large'>" + title + "</span>")
+		f_title = "<span size='large'>" + title + "</span>"
+		self.title.set_markup(f_title)
+		print ("gameview: title for", self.game.get_reference (), f_title)
 		
 		# Set the developers
 		developer = info.get_developers ()
@@ -246,33 +250,37 @@ class GameView(Gtk.ScrolledWindow):
 		# Set the cover
 		icon = GameInfo(info).get_pixbuf(self.cover_size, 0)
 		self.cover.set_from_pixbuf(icon)
+		print ("gameview: cover for", self.game.get_reference (), str (icon))
 		
 		# Set the release year
-		#if info.get_property("released"):
-		#	self._release_year.show()
-		#	self.release_year.show()
-		#	self.release_year.set_text(info.get_property("released"))
-		#else:
-		#	self._release_year.hide()
-		#	self.release_year.hide()
+		if info.get_property("release_date"):
+			self._release_year.show()
+			self.release_year.show()
+			self.release_year.set_text(info.get_property("release_date"))
+		else:
+			self._release_year.hide()
+			self.release_year.hide()
 		
 		# Set the system
-		#if info.get_property("system"):
-		#	self._system.show()
-		#	self.system.show()
-		#	self.system.set_text(info.get_property("system").get_name())
-		#else:
-		#	self._system.hide()
-		#	self.system.hide()
+		if info.get_property("system"):
+			self._system.show()
+			self.system.show()
+			self.system.set_text(info.get_property("system").get_name())
+		else:
+			self._system.hide()
+			self.system.hide()
 		
 		# Set the genre
-		#if info.get_property("genre"):
-		#	self._genre.show()
-		#	self.genre.show()
-		#	self.genre.set_text(info.get_property("genre"))
-		#else:
-		#	self._genre.hide()
-		#	self.genre.hide()
+		genre = info.get_genres ()
+		if len (genre) > 0:
+			self._genre.show()
+			self.genre.show()
+			genre = ", ".join (genre)
+			self.genre.set_text(genre)
+		else:
+			self._genre.hide()
+			self.genre.hide()
+			developer = "Unknown developer"
 		
 		# Set the play informations
 		if info.get_property("played") > 0:
