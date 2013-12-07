@@ -73,7 +73,8 @@ class GameList(Gtk.Box):
 		return False
 	
 	def add_game(self, game):
-		if (not self.has_game(GameList.get_game_reference (game))) and game.query_is_available():
+		#if (not self.has_game(GameList.get_game_reference (game))) and game.query_is_available():
+		if (not self.has_game(GameList.get_game_reference (game))):
 			info = game.get_info()
 			if not info:
 				info = Badnik.GameInfo()
@@ -97,7 +98,7 @@ class GameList(Gtk.Box):
 			self.games[id] = game
 	
 	def get_game_reference (game):
-		return game.get_property ("system").get_reference () + ":" + game.get_reference ()
+		return game.get_system_reference () + ":" + game.get_reference ()
 	
 	def set_view(self, settings=None, setting=None):
 		value = self.app.settings.get_value('view-as').get_string()

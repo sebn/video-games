@@ -217,13 +217,16 @@ class GameView(Gtk.ScrolledWindow):
 		self.add_with_viewport(self.grid)
 		
 		self.game = None
+		self.library = None
 	
-	def set_game(self, game):
+	def set_game(self, game, library = None):
 		self.game = game
-		game.connect('updated', self.on_game_updated)
+		self.library = library
+		
+		library.connect('game_updated', self.on_game_updated)
 		self._set_informations_from_game()
 	
-	def on_game_updated (self, game):
+	def on_game_updated (self, library, game_id):
 		self._set_informations_from_game ()
 	
 	def _set_informations_from_game(self):
@@ -288,39 +291,51 @@ class GameView(Gtk.ScrolledWindow):
 			developer = "Unknown developer"
 		
 		# Set the play informations
-		if info.get_property("played") > 0:
-			# Get the time played
-			s = int(info.get_property("played"))
+		if self.game and self.library:
+			uri = self.game.get_uri ()
+			db_id = self.library.get_game_id (uri)
 			
-			d = s // 86400
-			h = (s // 3600) % 24
-			m = (s // 60) % 60
-			s = s % 60
+			s = self.library.get_play_duration_for_game (db_id)
+			last_time = self.library.get_last_play_time_for_game (db_id)
 			
-			if d != 0:
-				time_played = str(d) + "d " + str(h) + "h "
-			elif h != 0:
-				time_played = str(h) + "h " + str(m) + "m "
-			elif m != 0:
-				time_played = str(m) + "m " + str(s) + "s"
+			if s > 0:
+				# Get the time played
+				d = s // 86400
+				h = (s // 3600) % 24
+				m = (s // 60) % 60
+				s = s % 60
+			
+				if d != 0:
+					time_played = str(d) + "d " + str(h) + "h "
+				elif h != 0:
+					time_played = str(h) + "h " + str(m) + "m "
+				elif m != 0:
+					time_played = str(m) + "m " + str(s) + "s"
+				else:
+					time_played = str(s) + "s"
+			
+				# If the last play day is the current day, display the play time, else display the date
+				current_time = time.localtime()
+				last_time = time.localtime(last_time)
+				
+				played_today = current_time[:3] == last_time[:3]
+				if played_today:
+					last_played = time.strftime("%H:%M:%S", last_time)
+				else:
+					last_played = time.strftime("%d %b %Y", last_time)
+			
+				self._time_played.show()
+				self.time_played.show()
+				self._last_played.show()
+				self.last_played.show()
+				self.time_played.set_text(time_played)
+				self.last_played.set_text(last_played)
 			else:
-				time_played = str(s) + "s"
-			
-			# If the last play day is the current day, display the play time, else display the date
-			current_time = time.localtime()
-			last_time = time.localtime(int(info.get_property("playedlast")))
-			played_today = current_time[:3] == last_time[:3]
-			if played_today:
-				last_played = time.strftime("%H:%M:%S", last_time)
-			else:
-				last_played = time.strftime("%d %b %Y", last_time)
-			
-			self._time_played.show()
-			self.time_played.show()
-			self._last_played.show()
-			self.last_played.show()
-			self.time_played.set_text(time_played)
-			self.last_played.set_text(last_played)
+				self._time_played.show()
+				self.time_played.show()
+				self._last_played.hide()
+				self.last_played.hide()
+				self.time_played.set_text("Never")
 		else:
 			self._time_played.show()
 			self.time_played.show()

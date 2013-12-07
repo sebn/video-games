@@ -211,7 +211,10 @@ class BadnikApplication(Gtk.Application):
 		time_played = end_time - start_time
 		
 		if return_code == 0 or time_played > 10:
-			game.update_play_time(start_time, end_time)
+			game_id = self.gamesdb.get_game_id (game.get_uri ())
+			self.gamesdb.update_play_time (game_id, start_time, end_time)
+			game.emit('update_play_time', start_time, end_time)
+			#game.update_play_time(start_time, end_time)
 
 from gi.repository import GObject
 
