@@ -66,4 +66,10 @@ else:
 			self.set_show_modes(False)
 			
 			self.show_all()
+		
+		def set_title (self, title):
+			pass
+		
+		def set_custom_title (self, widget):
+			pass
 
