@@ -341,11 +341,12 @@ class GameView(Gtk.ScrolledWindow):
 			self.time_played.set_text("Never")
 		
 		# Set the players number
-		min_players = info.get_property("min_players")
-		max_players = info.get_property("max_players")
-		if min_players > 0 and max_players > 0:
+		players = info.get_property("players")
+		if players:
 			self._players.show()
 			self.players.show()
+			min_players = players.get_lower_endpoint ()
+			max_players = players.get_upper_endpoint ()
 			if min_players == max_players:
 				self.players.set_text(str(min_players))
 			else:
