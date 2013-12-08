@@ -27,3 +27,9 @@ Change unwanted "badnik" references to "video-games" in:
 - executable
 - …
 
+Port the UI to Glade.
+
+Allow to add games by clicking the *add games* button.
+
+Publish a first stable version handling desktop entries.
+
