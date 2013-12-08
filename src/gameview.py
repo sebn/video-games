@@ -253,7 +253,6 @@ class GameView(Gtk.ScrolledWindow):
 		# Set the cover
 		icon = GameInfo(info).get_pixbuf(self.cover_size, 0)
 		self.cover.set_from_pixbuf(icon)
-		print ("gameview: cover for", self.game.get_reference (), str (icon))
 		
 		# Set the release date
 		date = info.get_property("release_date")

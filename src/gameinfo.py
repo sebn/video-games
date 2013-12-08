@@ -24,11 +24,17 @@ class GameInfo:
 		self.gameinfo = gameinfo
 		
 	def get_pixbuf (self, size, flags):
-		if self.gameinfo.get_property("cover"):
+		cover = self.gameinfo.get_property("cover")
+		
+		if cover:
+			from urllib import request
+			f = open('00000001.jpg','wb')
+			img = request.urlopen(cover.get_front ())
+			f.write(img.read())
+			f.close()
+			
 			try:
-				pixbuf = Gdk.Pixbuf.from_file_at_scale(self.gameinfo.get_property("cover"), size, size, True)
-				print ("pixbuf 1", str(pixbuf))
-				return pixbuf
+				return GdkPixbuf.Pixbuf.new_from_file_at_size('00000001.jpg', size, size)
 			except:
 				pass
 		
