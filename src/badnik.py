@@ -48,6 +48,7 @@ class BadnikApplication(Gtk.Application):
 		self.systems = Badnik.SystemCollection ()
 		self.systems.add (Badnik.MegaDrive ())
 		self.systems.add (Badnik.Desktop ())
+		self.systems.add (Badnik.SuperNintendo ())
 		
 		self.gamesdb = BadnikLibrary(self, self.savedatadir)
 		
