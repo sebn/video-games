@@ -167,8 +167,7 @@ class BadnikApplication(Gtk.Application):
 	def on_add_games(self, action, data):
 		print("add games")
 	
-	def on_game_found (self, systems, system, uri):
-		game = system.get_game (uri)
+	def on_game_found (self, systems, game):
 		self.gamesdb.add (game)
 	
 	def on_game_added (self, library, game):
