@@ -81,7 +81,7 @@ class GameList(Gtk.Box):
 			
 			id = GameList.get_game_reference (game)
 			uri = ""
-			primary_text = info.get_property("title")
+			primary_text = info.get_property("common_title")
 			secondary_text = ", ".join (info.get_developers ())
 			icon = GameInfo(info).get_pixbuf(self.get_requiered_pixbuf_size (), 0)
 			mtime = int(time.time())

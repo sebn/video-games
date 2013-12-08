@@ -217,16 +217,16 @@ class GameView(Gtk.ScrolledWindow):
 		self.add_with_viewport(self.grid)
 		
 		self.game = None
-		self.library = None
+		self.playinfo = None
 	
-	def set_game(self, game, library = None):
+	def set_game(self, game, playinfo = None):
 		self.game = game
-		self.library = library
+		self.playinfo = playinfo
 		
-		library.connect('game_updated', self.on_game_updated)
+		playinfo.connect('updated', self.on_playinfo_updated)
 		self._set_informations_from_game()
 	
-	def on_game_updated (self, library, game_id):
+	def on_playinfo_updated (self, playinfo):
 		self._set_informations_from_game ()
 	
 	def _set_informations_from_game(self):
@@ -270,10 +270,10 @@ class GameView(Gtk.ScrolledWindow):
 			self.release_year.hide()
 		
 		# Set the system
-		if info.get_property("system"):
+		if info.get_property("system_name"):
 			self._system.show()
 			self.system.show()
-			self.system.set_text(info.get_property("system").get_name())
+			self.system.set_text(info.get_property("system_name"))
 		else:
 			self._system.hide()
 			self.system.hide()
@@ -291,12 +291,9 @@ class GameView(Gtk.ScrolledWindow):
 			developer = "Unknown developer"
 		
 		# Set the play informations
-		if self.game and self.library:
-			uri = self.game.get_uri ()
-			db_id = self.library.get_game_id (uri)
-			
-			s = self.library.get_play_duration_for_game (db_id)
-			last_time = self.library.get_last_play_time_for_game (db_id)
+		if self.game and self.playinfo:
+			s = self.playinfo.get_play_duration ()
+			last_time = self.playinfo.get_last_play_time ()
 			
 			if s > 0:
 				# Get the time played

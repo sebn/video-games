@@ -87,7 +87,7 @@ class BadnikWindow(Gtk.ApplicationWindow):
 	
 	def on_game_clicked(self, view, game):
 		self.game = game
-		self.gameview.set_game (game, self.app.gamesdb)
+		self.gameview.set_game (game, self.app.gamesdb.get_play_info (game))
 		self.set_mode ('game')
 	
 	def set_mode (self, mode):
@@ -120,6 +120,6 @@ class BadnikWindow(Gtk.ApplicationWindow):
 			self.headerbar.add_games_button.hide ()
 			self.headerbar.play_game_button.show ()
 			
-			self.headerbar.set_title (self.game.get_info ().get_property ('title'))
+			self.headerbar.set_title (self.game.get_info ().get_property ('common_title'))
 			self.headerbar.set_custom_title (None)
 
